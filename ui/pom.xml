@@ -3,48 +3,30 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.vaadin</groupId>
-		<artifactId>droid</artifactId>
+		<artifactId>teleport</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>ui</artifactId>
-	<packaging>war</packaging>
+
+	<packaging>jar</packaging>
 
 	<dependencies>
 		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>org.vaadin.spring</groupId>
+			<artifactId>spring-boot-vaadin</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>backend-api</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>backend-api</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<artifactId>dawn</artifactId>
-			<groupId>org.peimari</groupId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-server</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-client-compiled</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.vaadin.spring</groupId>
-			<artifactId>spring-vaadin</artifactId>
+			<artifactId>dawn</artifactId>
+			<groupId>org.peimari</groupId>
 		</dependency>
 	</dependencies>
-
 </project>
