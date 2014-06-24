@@ -18,7 +18,7 @@ public class TeleportVaadinUI extends UI {
 		VerticalLayout layout = new VerticalLayout();
 		Label hello = new Label("Hello!");
 		layout.addComponent(hello);
-		
+
 		setContent(layout);
 	}
 }
