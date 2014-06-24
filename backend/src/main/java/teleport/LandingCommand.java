@@ -1,4 +1,4 @@
-package com.vaadin.teleport.backend.command;
+package teleport;
 
 public class LandingCommand extends RefCommand {
 	private static final String LANDING_COMMAND = "290717696";

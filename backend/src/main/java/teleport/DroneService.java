@@ -1,11 +1,7 @@
-package com.vaadin.teleport.backend;
+package teleport;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.vaadin.teleport.backend.command.DroneCommand;
-import com.vaadin.teleport.backend.command.LandingCommand;
-import com.vaadin.teleport.backend.command.TakeOffCommand;
 
 @Service
 public class DroneService {

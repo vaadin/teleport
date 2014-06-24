@@ -1,4 +1,4 @@
-package com.vaadin.teleport.backend.command;
+package teleport;
 
 public class TakeOffCommand extends RefCommand {
 	private static final String TAKEOFF_COMMAND = "290718208";

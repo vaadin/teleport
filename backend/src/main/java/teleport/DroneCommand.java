@@ -1,4 +1,4 @@
-package com.vaadin.teleport.backend.command;
+package teleport;
 
 public interface  DroneCommand {
 

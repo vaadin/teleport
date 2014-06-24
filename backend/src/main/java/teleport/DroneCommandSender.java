@@ -1,4 +1,4 @@
-package com.vaadin.teleport.backend;
+package teleport;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -6,17 +6,18 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 
-import com.vaadin.teleport.backend.command.DroneCommand;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DroneCommandSender {
 	private static final int DEFAULT_PORT = 5556;
 	private static final String DEFAULT_IP = "192.168.1.1";
-	
+
 	private static final int MAX_SEQUENCE_NUMBER = 512;
 
 	private byte[] ipBytes = new byte[4];
-	
-	private int commandSequenceNumber;
+
+	private int commandSequenceNumber = 100;
 
 	public DroneCommandSender() {
 		this(DEFAULT_IP);
@@ -28,15 +29,16 @@ public class DroneCommandSender {
 
 	public void executeCommand(DroneCommand command) {
 		DatagramSocket socket = null;
-		
+
 		commandSequenceNumber += 1;
-		
-		if(commandSequenceNumber > MAX_SEQUENCE_NUMBER) {
-			commandSequenceNumber = 1;
+
+		if (commandSequenceNumber > MAX_SEQUENCE_NUMBER) {
+			commandSequenceNumber = 100;
 		}
 
 		try {
-			DatagramPacket commandPacket = acquireCommandPacket(command, commandSequenceNumber);
+			DatagramPacket commandPacket = acquireCommandPacket(command,
+					commandSequenceNumber);
 			socket = new DatagramSocket();
 			socket.send(commandPacket);
 		} catch (Exception e) {
@@ -56,9 +58,9 @@ public class DroneCommandSender {
 		}
 	}
 
-	private DatagramPacket acquireCommandPacket(DroneCommand command, int commandSequenceNumber)
-			throws UnknownHostException {
-		byte[] buffer = command.asBytes(commandSequenceNumber);  
+	private DatagramPacket acquireCommandPacket(DroneCommand command,
+			int commandSequenceNumber) throws UnknownHostException {
+		byte[] buffer = command.asBytes(commandSequenceNumber);
 		DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
 				InetAddress.getByAddress(ipBytes), DEFAULT_PORT);
 
