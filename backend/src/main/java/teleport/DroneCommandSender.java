@@ -57,6 +57,10 @@ public class DroneCommandSender {
 	private DatagramPacket acquireCommandPacket(DroneCommand command,
 			int commandSequenceNumber) throws UnknownHostException {
 		byte[] buffer = command.asBytes(commandSequenceNumber);
+
+		String stringRepresentation = new String(buffer);
+		System.out.println(stringRepresentation);
+		
 		DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
 				InetAddress.getByAddress(ipBytes), DEFAULT_PORT);
 

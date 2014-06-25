@@ -9,6 +9,6 @@ public class MoveBackwardsCommand extends PCMDCommand {
 
 	@Override
 	protected String wrap(int speed, int commandSequenceNumber) {
-		return "AT*PCMD=" + commandSequenceNumber + ",1," + speed + " ,0,0,0";
+		return "AT*PCMD=" + commandSequenceNumber + ",1," + speed + ",0,0,0";
 	} 
 }
