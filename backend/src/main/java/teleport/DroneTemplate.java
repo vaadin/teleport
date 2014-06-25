@@ -6,10 +6,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.StringTokenizer;
 
-import org.springframework.stereotype.Component;
+public class DroneTemplate {
 
-@Component
-public class DroneCommandSender {
 	private static final int DEFAULT_PORT = 5556;
 	private static final String DEFAULT_IP = "192.168.1.1";
 
@@ -17,11 +15,11 @@ public class DroneCommandSender {
 
 	private int commandSequenceNumber = 100;
 
-	public DroneCommandSender() {
+	public DroneTemplate() {
 		this(DEFAULT_IP);
 	}
 
-	public DroneCommandSender(String droneIP) {
+	public DroneTemplate(String droneIP) {
 		generateIpBytes(droneIP);
 	}
 
@@ -56,10 +54,10 @@ public class DroneCommandSender {
 
 	private DatagramPacket acquireCommandPacket(DroneCommand command,
 			int commandSequenceNumber) throws UnknownHostException {
-		byte[] buffer = command.asBytes(commandSequenceNumber);
+		String stringRepresentation = command.toString();
+        byte [] buffer = stringRepresentation.getBytes() ;
 
-		String stringRepresentation = new String(buffer);
-		System.out.println(stringRepresentation);
+ 		System.out.println(stringRepresentation);
 		
 		DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
 				InetAddress.getByAddress(ipBytes), DEFAULT_PORT);

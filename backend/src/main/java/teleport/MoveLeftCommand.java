@@ -1,14 +1,7 @@
 package teleport;
 
-public class MoveLeftCommand extends PCMDCommand {
-	
-	@Override
-	public byte[] asBytes(int commandSequenceNumber) {
-		return (wrap(intOfFloat(-0.5f), commandSequenceNumber) + "\r").getBytes();
-	}
-
-	@Override
-	protected String wrap(int speed, int commandSequenceNumber) {
-		return "AT*PCMD=" + commandSequenceNumber + ",1,0," + speed + ",0,0";
-	}
+class MoveLeftCommand extends PcmdCommand {
+    public MoveLeftCommand(int commandSeqNo, float roll) {
+        super(commandSeqNo, 0, -1 * roll, 0, 0);
+    }
 }

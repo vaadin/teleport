@@ -1,8 +1,23 @@
 package teleport;
 
-public interface  DroneCommand {
+abstract class DroneCommand {
 
-	byte[] asBytes(int commandSequenceNumber);
+    public static enum CommandType {
+        REF,
+        PCMD
+    }
 
-	String name();
+    private String command;
+
+    public DroneCommand(CommandType commandType, int commandSeqNo) {
+        this.command = "AT*" + commandType.name() + "=" + commandSeqNo + "," + buildCommand() + "\r";
+    }
+
+    @Override
+    public String toString() {
+        return this.command;
+    }
+
+    protected abstract String buildCommand();
 }
+

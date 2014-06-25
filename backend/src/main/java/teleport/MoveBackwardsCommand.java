@@ -1,14 +1,8 @@
 package teleport;
 
-public class MoveBackwardsCommand extends PCMDCommand {
+class MoveBackwardsCommand extends PcmdCommand {
 
-	@Override
-	public byte[] asBytes(int commandSequenceNumber) {
-		return (wrap(intOfFloat(-0.5f), commandSequenceNumber) + "\r").getBytes();
-	}
-
-	@Override
-	protected String wrap(int speed, int commandSequenceNumber) {
-		return "AT*PCMD=" + commandSequenceNumber + ",1," + speed + ",0,0,0";
-	} 
+    public MoveBackwardsCommand(int commandSeqNo, float speed) {
+        super(commandSeqNo, speed * -1, 0, 0, 0);
+    }
 }
