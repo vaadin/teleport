@@ -24,10 +24,7 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-client-compiled</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-		</dependency>
+
 		<dependency>
 			<artifactId>dawn</artifactId>
 			<groupId>org.peimari</groupId>
