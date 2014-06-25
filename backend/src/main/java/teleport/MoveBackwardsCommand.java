@@ -10,5 +10,5 @@ public class MoveBackwardsCommand extends PCMDCommand {
 	@Override
 	protected String wrap(String command, int commandSequenceNumber) {
 		return "AT*PCMD=" + commandSequenceNumber + ",1,0," + command + " ,0,0";
-	}
+	} 
 }

@@ -80,15 +80,27 @@ public class TeleportVaadinUI extends UI {
 	protected void init(VaadinRequest request) {
 		setSizeFull();
 		
+		
+		Button takeoff = new Button("Takeoff");
+		takeoff.addClickListener(e -> serviceProvider.takeOff());
+		
+		Button land = new Button("Land");
+		land.addClickListener(e -> serviceProvider.land());
+		
+		
+		HorizontalLayout basics = new HorizontalLayout();
+		basics.addComponents(takeoff, land);
+		
 		HorizontalLayout layout = new HorizontalLayout();
 		layout.setSpacing(true);
 
 		UpDownTurnLeftRight tlr = new UpDownTurnLeftRight(serviceProvider);
 		ForwardBackwardLeftRight udlr = new ForwardBackwardLeftRight(serviceProvider);
 		
-		layout.addComponents(tlr, udlr);
+		layout.addComponents(basics, tlr, udlr);
 		
 		layout.setComponentAlignment(udlr, Alignment.TOP_RIGHT);
+	
 		
 		setContent(layout);
 	}

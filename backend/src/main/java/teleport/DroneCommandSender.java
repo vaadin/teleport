@@ -40,7 +40,9 @@ public class DroneCommandSender {
 			DatagramPacket commandPacket = acquireCommandPacket(command,
 					commandSequenceNumber);
 			socket = new DatagramSocket();
+
 			socket.send(commandPacket);
+
 		} catch (Exception e) {
 			System.err.println("Error sending command");
 		} finally {
