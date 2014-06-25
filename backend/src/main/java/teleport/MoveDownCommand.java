@@ -4,11 +4,11 @@ public class MoveDownCommand extends PCMDCommand {
 	
 	@Override
 	public byte[] asBytes(int commandSequenceNumber) {
-	return	wrap(MINUS_POINT_2, commandSequenceNumber).getBytes();
+	return	wrap(intOfFloat(-0.2f), commandSequenceNumber).getBytes();
 	}
 
 	@Override
-	protected String wrap(String command, int commandSequenceNumber) {
-		return "AT*PCMD=" + commandSequenceNumber + ",1,0,0," + command + ",0";
+	protected String wrap(int speed, int commandSequenceNumber) {
+		return "AT*PCMD=" + commandSequenceNumber + ",1,0,0," + speed + ",0";
 	}
 }

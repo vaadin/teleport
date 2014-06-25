@@ -1,18 +1,27 @@
 package teleport;
 
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
 public abstract class PCMDCommand implements DroneCommand {
 
-	protected static final String POINT_05 = "1028443341";
-	protected static final String POINT_1 = "1036831949";
-	protected static final String POINT_2 = "1045220557";
-	protected static final String POINT_5 = "1056964608";
+	protected abstract String wrap(int speed, int commandSequenceNumber);
 
-	protected static final String MINUS_POINT_05 = "-1119040307";
-	protected static final String MINUS_POINT_1 = "-1110651699";
-	protected static final String MINUS_POINT_2 = "-1102263091";
-	protected static final String MINUS_POINT_5 = "-1090519040";
+	private ByteBuffer bb = ByteBuffer.allocate(4);
 
-	protected abstract String wrap(String command, int commandSequenceNumber);
+	private FloatBuffer fb;
+	private IntBuffer ib;
+
+	public PCMDCommand() {
+		fb = bb.asFloatBuffer();
+		ib = bb.asIntBuffer();
+	}
+
+	protected int intOfFloat(float f) {
+		fb.put(0, f);
+		return ib.get(0);
+	}
 
 	@Override
 	public String name() {

@@ -13,8 +13,6 @@ public class DroneCommandSender {
 	private static final int DEFAULT_PORT = 5556;
 	private static final String DEFAULT_IP = "192.168.1.1";
 
-	private static final int MAX_SEQUENCE_NUMBER = 512;
-
 	private byte[] ipBytes = new byte[4];
 
 	private int commandSequenceNumber = 100;
@@ -31,10 +29,6 @@ public class DroneCommandSender {
 		DatagramSocket socket = null;
 
 		commandSequenceNumber += 1;
-
-		if (commandSequenceNumber > MAX_SEQUENCE_NUMBER) {
-			commandSequenceNumber = 100;
-		}
 
 		try {
 			DatagramPacket commandPacket = acquireCommandPacket(command,
