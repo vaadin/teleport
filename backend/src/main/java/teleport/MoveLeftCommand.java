@@ -1,6 +1,6 @@
 package teleport;
 
-public class MoveForwardCommand extends PCMDCommand {
+public class MoveLeftCommand extends PCMDCommand {
 	
 	@Override
 	public byte[] asBytes(int commandSequenceNumber) {
@@ -9,6 +9,6 @@ public class MoveForwardCommand extends PCMDCommand {
 
 	@Override
 	protected String wrap(String command, int commandSequenceNumber) {
-		return "AT*PCMD=" + commandSequenceNumber + ",1,0," + command + " ,0,0";
+		return "AT*PCMD=" + commandSequenceNumber + ",1," + command + ",0,0,0";
 	}
 }

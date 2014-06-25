@@ -9,4 +9,10 @@ public abstract class RefCommand implements DroneCommand {
 	protected String wrap(String command, int commandSequenceNumber) {
 		return "AT*REF=" + commandSequenceNumber +"," + command + "\r";
 	}
+	
+	
+	@Override
+	public String name() {
+		return getClass().getSimpleName();
+	}
 }

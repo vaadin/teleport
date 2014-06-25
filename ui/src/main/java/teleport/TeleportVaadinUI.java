@@ -7,6 +7,7 @@ import teleport.DroneService;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -21,70 +22,74 @@ public class TeleportVaadinUI extends UI {
 
 	@Autowired
 	private DroneService service;
+	
+	private DroneServiceProvider serviceProvider = new DroneServiceProvider() {
+		
+		@Override
+		public void up() {
+			service.executeCommand(new MoveUpCommand());
+		}
+		
+		@Override
+		public void rotateRight() {
+			service.executeCommand(new RotateRightCommand());
+		}
+		
+		@Override
+		public void rotateLeft() {
+			service.executeCommand(new RotateLeftCommand());
+		}
+		
+		@Override
+		public void right() {
+			service.executeCommand(new MoveRightCommand());
+		}
+		
+		@Override
+		public void left() {
+			service.executeCommand(new MoveLeftCommand());
+		}
+		
+		@Override
+		public void down() {
+			service.executeCommand(new MoveDownCommand());
+		}
+
+		@Override
+		public void takeOff() {
+			service.executeCommand(new TakeOffCommand());
+		}
+
+		@Override
+		public void land() {
+			service.executeCommand(new LandCommand());
+		}
+
+		@Override
+		public void forward() {
+			service.executeCommand(new MoveForwardCommand());
+		}
+
+		@Override
+		public void backward() {
+			service.executeCommand(new MoveBackwardsCommand());
+		}
+	};
 
 	@Override
 	protected void init(VaadinRequest request) {
-		VerticalLayout layout = new VerticalLayout();
-
-		HorizontalLayout refCommands = new HorizontalLayout();
-		refCommands.setCaption("REFs");
-
-		Button takeoff = new Button("Takeoff", new Button.ClickListener() {
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				service.takeOff();
-			}
-		});
-
-		Button land = new Button("Land", new Button.ClickListener() {
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				service.land();
-			}
-		});
-
-		refCommands.addComponents(takeoff, land);
-
-		HorizontalLayout PCMDCommands = new HorizontalLayout();
-		PCMDCommands.setCaption("PCMDs");
-
-		Button up = new Button("Up", new Button.ClickListener() {
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				service.executeCommand(new MoveUpCommand());
-			}
-		});
-
-		Button down = new Button("Down", new Button.ClickListener() {
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				service.executeCommand(new MoveDownCommand());
-			}
-		});
+		setSizeFull();
 		
-		Button forward = new Button("Forward", new Button.ClickListener() {
+		HorizontalLayout layout = new HorizontalLayout();
+		layout.setSpacing(true);
 
-			@Override
-			public void buttonClick(ClickEvent event) {
-				service.executeCommand(new MoveForwardCommand());
-			}
-		});
+		UpDownTurnLeftRight tlr = new UpDownTurnLeftRight(serviceProvider);
+		ForwardBackwardLeftRight udlr = new ForwardBackwardLeftRight(serviceProvider);
 		
-		Button backwards = new Button("Backward", new Button.ClickListener() {
-
-			@Override
-			public void buttonClick(ClickEvent event) {
-				service.executeCommand(new MoveBackwardsCommand());
-			}
-		});
+		layout.addComponents(tlr, udlr);
 		
-		PCMDCommands.addComponents(up, down, forward, backwards);
-
-		layout.addComponents(refCommands, PCMDCommands);
+		layout.setComponentAlignment(udlr, Alignment.TOP_RIGHT);
+		
 		setContent(layout);
 	}
 }

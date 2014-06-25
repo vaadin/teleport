@@ -1,11 +1,10 @@
 package teleport;
 
 public class MoveBackwardsCommand extends PCMDCommand {
-	private static final String BACK = "1045220557";
 
 	@Override
 	public byte[] asBytes(int commandSequenceNumber) {
-		return wrap(BACK, commandSequenceNumber).getBytes();
+		return wrap(POINT_2, commandSequenceNumber).getBytes();
 	}
 
 	@Override

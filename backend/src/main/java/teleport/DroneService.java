@@ -10,6 +10,7 @@ public class DroneService {
 	private DroneCommandSender commandSender;
 
 	public void executeCommand(DroneCommand command) {
+		System.out.println("Executing " + command.name());
 		commandSender.executeCommand(command);
 	}
 
@@ -18,6 +19,6 @@ public class DroneService {
 	}
 
 	public void land() {
-		commandSender.executeCommand(new LandingCommand());
+		commandSender.executeCommand(new LandCommand());
 	}
 }
