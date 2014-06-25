@@ -3,6 +3,6 @@ package teleport;
 class MoveForwardCommand extends PcmdCommand {
 
 	public MoveForwardCommand(int commandSeqNo, float speed) {
-		super(commandSeqNo, speed, 0, 0, 0);
+		super(commandSeqNo, 0, -1 * speed, 0, 0);
 	}
 }

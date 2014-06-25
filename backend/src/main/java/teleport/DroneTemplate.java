@@ -97,6 +97,6 @@ public class DroneTemplate {
 	}
 
 	public void moveBackwards(float f) {
-		executeCommand(new MoveBackwardsCommand(commandSequenceNumber++, f));
+		executeCommand(new MoveBackwardCommand(commandSequenceNumber++, f));
 	}
 }
