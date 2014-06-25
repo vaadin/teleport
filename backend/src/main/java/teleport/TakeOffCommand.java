@@ -7,5 +7,4 @@ class TakeOffCommand extends RefCommand {
     public TakeOffCommand(int commandSeqNo) {
         super(commandSeqNo, TAKEOFF_COMMAND);
     }
-
 }

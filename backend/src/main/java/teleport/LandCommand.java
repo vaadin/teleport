@@ -7,5 +7,4 @@ class LandCommand extends RefCommand {
     public LandCommand(int commandSeqNo) {
         super(commandSeqNo, LANDING_COMMAND);
     }
-
 }

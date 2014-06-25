@@ -23,14 +23,11 @@ public class DroneTemplate {
 		generateIpBytes(droneIP);
 	}
 
-	public void executeCommand(DroneCommand command) {
+	protected void executeCommand(DroneCommand command) {
 		DatagramSocket socket = null;
 
-		commandSequenceNumber += 1;
-
 		try {
-			DatagramPacket commandPacket = acquireCommandPacket(command,
-					commandSequenceNumber);
+			DatagramPacket commandPacket = acquireCommandPacket(command);
 			socket = new DatagramSocket();
 
 			socket.send(commandPacket);
@@ -52,16 +49,53 @@ public class DroneTemplate {
 		}
 	}
 
-	private DatagramPacket acquireCommandPacket(DroneCommand command,
-			int commandSequenceNumber) throws UnknownHostException {
+	private DatagramPacket acquireCommandPacket(DroneCommand command) throws UnknownHostException {
 		String stringRepresentation = command.toString();
-        byte [] buffer = stringRepresentation.getBytes() ;
+		byte[] buffer = stringRepresentation.getBytes();
 
- 		System.out.println(stringRepresentation);
-		
 		DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
 				InetAddress.getByAddress(ipBytes), DEFAULT_PORT);
 
 		return packet;
+	}
+
+	public void ascend(float f) {
+		executeCommand(new AscendCommand(commandSequenceNumber++, f));
+	}
+
+	public void descend(float f) {
+		executeCommand(new DescendCommand(commandSequenceNumber++, f));
+	}
+
+	public void rotateRight(float f) {
+		executeCommand(new RotateRightCommand(commandSequenceNumber++, f));
+	}
+
+	public void rotateLeft(float f) {
+		executeCommand(new RotateLeftCommand(commandSequenceNumber++, f));
+	}
+
+	public void moveRight(float f) {
+		executeCommand(new MoveRightCommand(commandSequenceNumber++, f));
+	}
+
+	public void moveLeft(float f) {
+		executeCommand(new MoveLeftCommand(commandSequenceNumber++, f));
+	}
+
+	public void takeOff() {
+		executeCommand(new TakeOffCommand(commandSequenceNumber++));
+	}
+
+	public void land() {
+		executeCommand(new LandCommand(commandSequenceNumber++));
+	}
+
+	public void moveForward(float f) {
+		executeCommand(new MoveForwardCommand(commandSequenceNumber++, f));
+	}
+
+	public void moveBackwards(float f) {
+		executeCommand(new MoveBackwardsCommand(commandSequenceNumber++, f));
 	}
 }
