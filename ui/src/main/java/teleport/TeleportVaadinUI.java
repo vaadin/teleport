@@ -3,6 +3,7 @@ package teleport;
 import org.vaadin.spring.VaadinUI;
 
 import com.vaadin.annotations.Theme;
+import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -78,6 +79,7 @@ public class TeleportVaadinUI extends UI {
 
 		Button land = new Button("Land");
 		land.addClickListener(e -> serviceProvider.land());
+		land.setClickShortcut(KeyCode.SPACEBAR);
 
 		HorizontalLayout basics = new HorizontalLayout();
 		basics.addComponents(takeoff, land);
