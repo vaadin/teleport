@@ -4,7 +4,7 @@ public class MoveDownCommand extends PCMDCommand {
 
 	@Override
 	public byte[] asBytes(int commandSequenceNumber) {
-		return wrap(intOfFloat(-0.2f), commandSequenceNumber).getBytes();
+		return (wrap(intOfFloat(-0.2f), commandSequenceNumber) + "\r").getBytes();
 	}
 
 	@Override
