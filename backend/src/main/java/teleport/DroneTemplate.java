@@ -51,6 +51,7 @@ public class DroneTemplate {
 
 	private DatagramPacket acquireCommandPacket(DroneCommand command) throws UnknownHostException {
 		String stringRepresentation = command.toString();
+		System.out.println(stringRepresentation);
 		byte[] buffer = stringRepresentation.getBytes();
 
 		DatagramPacket packet = new DatagramPacket(buffer, buffer.length,

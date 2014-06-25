@@ -9,21 +9,23 @@ class PcmdCommand extends DroneCommand {
     private float gaz, yaw, pitch, roll;
 
     @Override
-    protected String buildCommand() {
+    protected String buildParameters() {
         float[] vals = {pitch, roll, gaz, yaw};
         String[] intVals = new String[vals.length];
         for (int i = 0; i < vals.length; i++) {
-            intVals[i] = i == 0 ? "0" : Integer.toString(intOfFloat(vals[i]));
+            intVals[i] = vals[i] == 0 ? "0" : Integer.toString(intOfFloat(vals[i]));
         }
         return "1," + String.join(",", intVals);
     }
 
     public PcmdCommand(int commandSeqNo, float pitch, float roll, float gaz, float yaw) {
         super(CommandType.PCMD, commandSeqNo);
-        this.gaz = gaz;
-        this.yaw = yaw;
         this.pitch = pitch;
         this.roll = roll;
+        this.gaz = gaz;
+        this.yaw = yaw;
+        
+        buildCommand();
     }
 
     private int intOfFloat(float f) {
