@@ -1,77 +1,81 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>com.vaadin</groupId>
-		<artifactId>teleport</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-	</parent>
-	<artifactId>ui</artifactId>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.vaadin</groupId>
+        <artifactId>teleport</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <artifactId>ui</artifactId>
 
-	<packaging>jar</packaging>
+    <packaging>jar</packaging>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.vaadin.spring</groupId>
-			<artifactId>spring-boot-vaadin</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client-compiler</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>javax.validation</groupId>
-					<artifactId>validation-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<artifactId>dawn</artifactId>
-			<groupId>org.peimari</groupId>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>backend</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.vaadin.addons</groupId>
-			<artifactId>gwt-graphics</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-	</dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.vaadin.spring</groupId>
+            <artifactId>spring-boot-vaadin</artifactId>
 
-	<build>
-		<plugins>
-<!-- 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin> -->
-			<plugin>
-				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-maven-plugin</artifactId>
-				<version>${vaadin.version}</version>
-				<configuration>
-					<strict>true</strict>
-					<logLevel>INFO</logLevel>
-					<extraJvmArgs>-Xmx3g -Xss2048k</extraJvmArgs>
-					<webappDirectory>${basedir}/src/main/resources/VAADIN/widgetsets</webappDirectory>
-					<runTarget>http://localhost:8080/</runTarget>
-					<hostedWebapp>${basedir}/src/main/resources/VAADIN/widgetsets</hostedWebapp>
-					<noServer>true</noServer>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-client-compiler</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>vaadin-client</artifactId>
+        </dependency>
+        <dependency>
+            <artifactId>dawn</artifactId>
+            <groupId>org.peimari</groupId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>backend</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.vaadin.addons</groupId>
+            <artifactId>gwt-graphics</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+    </dependencies>
+    <properties>
+        <hibernate-validator.version>4.3.1.Final</hibernate-validator.version>
+    </properties>
+    <build>
+
+        <plugins>
+<!--
+
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+-->
+
+
+            <plugin>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-maven-plugin</artifactId>
+                <version>${vaadin.version}</version>
+                <configuration>
+                    <strict>true</strict>
+                    <logLevel>INFO</logLevel>
+                    <extraJvmArgs>-Xmx3g -Xss2048k</extraJvmArgs>
+                    <webappDirectory>${basedir}/src/main/resources/VAADIN/widgetsets</webappDirectory>
+                    <runTarget>http://localhost:8080/</runTarget>
+                    <hostedWebapp>${basedir}/src/main/resources/VAADIN/widgetsets</hostedWebapp>
+                    <noServer>true</noServer>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
