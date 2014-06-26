@@ -2,4 +2,5 @@
 <module rename-to='Droid'>
 	<inherits name="com.vaadin.DefaultWidgetSet" />
 	<inherits name="com.vaadin.jogdial.JogDialWidgetset" />
+	<inherits name="com.vaadin.addon.touchkit.gwt.TouchKitWidgetSet" />
 </module>
