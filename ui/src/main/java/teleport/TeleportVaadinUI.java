@@ -1,12 +1,11 @@
 package teleport;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.VaadinUI;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.jogdial.JogDial;
-import com.vaadin.jogdial.JogDial.AxisMoveEvent;
-import com.vaadin.jogdial.JogDial.AxisMoveListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -19,35 +18,8 @@ import com.vaadin.ui.VerticalLayout;
 public class TeleportVaadinUI extends UI {
 	private static final long serialVersionUID = 6337889226477810842L;
 
-	private DroneTemplate service = new DroneTemplate();
-
-	private DroneServiceProvider serviceProvider = new DroneServiceProvider() {
-
-		@Override
-		public void takeOff() {
-			service.takeOff();
-		}
-
-		@Override
-		public void land() {
-			service.land();
-		}
-
-		@Override
-		public void moveByAxis(float pitch, float roll) {
-			service.moveByAxis(pitch, roll);
-		}
-
-		@Override
-		public void rotateByAxis(float x) {
-			service.rotate(x);
-		}
-
-		@Override
-		public void changeAltitudeByAxis(float y) {
-			service.changeAltitude(y);
-		}
-	};
+	@Autowired
+	private DroneTemplate service;
 
 	@Override
 	protected void init(VaadinRequest request) {
@@ -60,10 +32,10 @@ public class TeleportVaadinUI extends UI {
 		setContent(mainLayout);
 
 		Button takeoff = new Button("Takeoff");
-		takeoff.addClickListener(e -> serviceProvider.takeOff());
+		takeoff.addClickListener(e -> service.takeOff());
 
 		Button land = new Button("Land");
-		land.addClickListener(e -> serviceProvider.land());
+		land.addClickListener(e -> service.land());
 		land.setClickShortcut(KeyCode.SPACEBAR);
 
 		HorizontalLayout buttonLayout = new HorizontalLayout();
@@ -72,13 +44,10 @@ public class TeleportVaadinUI extends UI {
 		buttonLayout.addComponents(takeoff, land);
 
 		JogDial rotation = new JogDial();
-		rotation.addAxisMoveListener(e -> serviceProvider.rotateByAxis(e.getX()));
-//		rotation.addAxisMoveListener(e -> serviceProvider
-//				.changeAltitudeByAxis(e.getY()));
+		rotation.addAxisMoveListener(e -> service.rotateByAxis(e.getX()));
 
 		JogDial movement = new JogDial();
-		movement.addAxisMoveListener(e -> serviceProvider.moveByAxis(e.getX(),
-				e.getY()));
+		movement.addAxisMoveListener(e -> service.moveByAxis(e.getX(), e.getY()));
 
 		HorizontalLayout jogDialLayout = new HorizontalLayout();
 		jogDialLayout.setWidth(100, Unit.PERCENTAGE);

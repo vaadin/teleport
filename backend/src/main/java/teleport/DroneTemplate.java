@@ -1,100 +1,35 @@
 package teleport;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.StringTokenizer;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
+@Component
+@Scope("singleton")
 public class DroneTemplate {
-
-	private static final int DEFAULT_PORT = 5556;
-	private static final String DEFAULT_IP = "192.168.1.1";
-
-	private byte[] ipBytes = new byte[4];
-
-	private int commandSequenceNumber = 100;
+	private DroneCommandExecuter commandExecuter;
 
 	public DroneTemplate() {
-		this(DEFAULT_IP);
-	}
-
-	public DroneTemplate(String droneIP) {
-		generateIpBytes(droneIP);
-	}
-
-	protected void executeCommand(DroneCommand command) {
-		DatagramSocket socket = null;
-
-		try {
-			DatagramPacket commandPacket = acquireCommandPacket(command);
-			socket = new DatagramSocket();
-
-			socket.send(commandPacket);
-
-		} catch (Exception e) {
-			System.err.println("Error sending command");
-		} finally {
-			if (socket != null) {
-				socket.close();
-			}
-		}
-	}
-
-	private void generateIpBytes(String droneIP) {
-		StringTokenizer st = new StringTokenizer(droneIP, ".");
-
-		for (int i = 0; i < 4; i++) {
-			ipBytes[i] = (byte) Integer.parseInt(st.nextToken());
-		}
-	}
-
-	private DatagramPacket acquireCommandPacket(DroneCommand command)
-			throws UnknownHostException {
-		String stringRepresentation = command.toString();
-		System.out.println(stringRepresentation);
-		byte[] buffer = stringRepresentation.getBytes();
-
-		DatagramPacket packet = new DatagramPacket(buffer, buffer.length,
-				InetAddress.getByAddress(ipBytes), DEFAULT_PORT);
-
-		return packet;
+		commandExecuter = new DroneCommandExecuter();
+		commandExecuter.start();
 	}
 
 	public void changeAltitude(float f) {
-		executeCommand(new ChangeAltitudeCommand(commandSequenceNumber++, f));
+		commandExecuter.changeAltitude(f);
 	}
 
-	public void rotate(float f) {
-		executeCommand(new RotateCommand(commandSequenceNumber++, f));
-	}
-
-	public void moveRight(float f) {
-		executeCommand(new MoveRightCommand(commandSequenceNumber++, f));
-	}
-
-	public void moveLeft(float f) {
-		executeCommand(new MoveLeftCommand(commandSequenceNumber++, f));
-	}
-
-	public void takeOff() {
-		executeCommand(new TakeOffCommand(commandSequenceNumber++));
-	}
-
-	public void land() {
-		executeCommand(new LandCommand(commandSequenceNumber++));
-	}
-
-	public void moveForward(float f) {
-		executeCommand(new MoveForwardCommand(commandSequenceNumber++, f));
-	}
-
-	public void moveBackwards(float f) {
-		executeCommand(new MoveBackwardCommand(commandSequenceNumber++, f));
+	public void rotateByAxis(float f) {
+		commandExecuter.rotateByAxis(f);
 	}
 
 	public void moveByAxis(float pitch, float roll) {
-		executeCommand(new MoveByAxisCommand(commandSequenceNumber++, pitch,
-				roll));
+		commandExecuter.moveByAxis(pitch, roll);
+	}
+
+	public void takeOff() {
+		commandExecuter.takeOff();
+	}
+
+	public void land() {
+		commandExecuter.land();
 	}
 }
