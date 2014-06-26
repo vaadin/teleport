@@ -6,33 +6,35 @@ import java.nio.IntBuffer;
 
 class PcmdCommand extends DroneCommand {
 
-    private float gaz, yaw, pitch, roll;
+	private float pitch, roll, gaz, yaw;
 
-    public PcmdCommand(int commandSeqNo, float pitch, float roll, float gaz, float yaw) {
-        super(CommandType.PCMD, commandSeqNo);
-        this.pitch = pitch;
-        this.roll = roll;
-        this.gaz = gaz;
-        this.yaw = yaw;
-        
-        buildCommand();
-    }
+	public PcmdCommand(int commandSeqNo, float pitch, float roll, float gaz,
+			float yaw) {
+		super(CommandType.PCMD, commandSeqNo);
+		this.pitch = pitch;
+		this.roll = roll;
+		this.gaz = gaz;
+		this.yaw = yaw;
 
-    @Override
-    protected String buildParameters() {
-        float[] vals = {pitch, roll, gaz, yaw};
-        String[] intVals = new String[vals.length];
-        for (int i = 0; i < vals.length; i++) {
-            intVals[i] = vals[i] == 0 ? "0" : Integer.toString(intOfFloat(vals[i]));
-        }
-        return "1," + String.join(",", intVals);
-    }
-    
-    private int intOfFloat(float f) {
-        ByteBuffer bb = ByteBuffer.allocate(4);
-        IntBuffer ib = bb.asIntBuffer();
-        FloatBuffer fb = bb.asFloatBuffer();
-        fb.put(0, f);
-        return ib.get(0);
-    }
+		buildCommand();
+	}
+
+	@Override
+	protected String buildParameters() {
+		float[] vals = { pitch, roll, gaz, yaw };
+		String[] intVals = new String[vals.length];
+		for (int i = 0; i < vals.length; i++) {
+			intVals[i] = vals[i] == 0 ? "0" : Integer
+					.toString(intOfFloat(vals[i]));
+		}
+		return "1," + String.join(",", intVals);
+	}
+
+	private int intOfFloat(float f) {
+		ByteBuffer bb = ByteBuffer.allocate(4);
+		IntBuffer ib = bb.asIntBuffer();
+		FloatBuffer fb = bb.asFloatBuffer();
+		fb.put(0, f);
+		return ib.get(0);
+	}
 }

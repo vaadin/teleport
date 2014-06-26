@@ -2,7 +2,7 @@ package teleport;
 
 class MoveLeftCommand extends PcmdCommand {
 
-	public MoveLeftCommand(int commandSeqNo, float roll) {
-        super(commandSeqNo, -1 * roll, 0, 0, 0);
+	public MoveLeftCommand(int commandSeqNo, float pitch) {
+        super(commandSeqNo, -1 * pitch, 0, 0, 0);
     }
 }

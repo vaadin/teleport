@@ -4,6 +4,9 @@ import org.vaadin.spring.VaadinUI;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutAction.KeyCode;
+import com.vaadin.jogdial.JogDial;
+import com.vaadin.jogdial.JogDial.AxisMoveEvent;
+import com.vaadin.jogdial.JogDial.AxisMoveListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -68,6 +71,11 @@ public class TeleportVaadinUI extends UI {
 		public void backward() {
 			service.moveBackwards(0.5f);
 		}
+
+		@Override
+		public void moveByAxis(float pitch, float roll) {
+			service.moveByAxis(pitch, roll);
+		}
 	};
 
 	@Override
@@ -88,12 +96,20 @@ public class TeleportVaadinUI extends UI {
 		layout.setSpacing(true);
 
 		UpDownTurnLeftRight tlr = new UpDownTurnLeftRight(serviceProvider);
-		ForwardBackwardLeftRight udlr = new ForwardBackwardLeftRight(
-				serviceProvider);
 
-		layout.addComponents(basics, tlr, udlr);
+		JogDial movement = new JogDial();
+		movement.addAxisMoveListener(new AxisMoveListener() {
+			private static final long serialVersionUID = -4259633131223375918L;
 
-		layout.setComponentAlignment(udlr, Alignment.TOP_RIGHT);
+			@Override
+			public void onAxisMoved(AxisMoveEvent event) {
+				serviceProvider.moveByAxis(event.getX(), event.getY());
+			}
+		});
+
+		layout.addComponents(basics, tlr, movement);
+
+		layout.setComponentAlignment(movement, Alignment.TOP_RIGHT);
 
 		setContent(layout);
 	}

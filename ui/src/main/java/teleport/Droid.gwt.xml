@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module rename-to='Droid'>
-
-  	<inherits name="com.vaadin.DefaultWidgetSet" />
-  	<inherits name="org.vaadin.gwtgraphics.GWTGraphics" />
-
-    <set-property name="user.agent" value="gecko1_8"/>    
-   
+	<inherits name="com.vaadin.DefaultWidgetSet" />
+	<inherits name="com.vaadin.jogdial.JogDialWidgetset" />
 </module>

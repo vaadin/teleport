@@ -9,6 +9,8 @@ public interface DroneServiceProvider {
 	public void rotateLeft();
 	public void rotateRight();
 	
+	public void moveByAxis(float pitch, float roll);
+	
 	public void forward();
 	public void backward();
 	public void left();

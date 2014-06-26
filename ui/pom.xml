@@ -76,9 +76,9 @@
 					<strict>true</strict>
 					<logLevel>INFO</logLevel>
 					<extraJvmArgs>-Xmx3g -Xss2048k</extraJvmArgs>
-					<webappDirectory>${basedir}/src/main/resources/VAADIN/widgetsets</webappDirectory>
+					<webappDirectory>${basedir}/src/main/webapp/VAADIN/widgetsets</webappDirectory>
 					<runTarget>http://localhost:8080/</runTarget>
-					<hostedWebapp>${basedir}/src/main/resources/VAADIN/widgetsets</hostedWebapp>
+					<hostedWebapp>${basedir}/src/main/webapp/VAADIN/widgetsets</hostedWebapp>
 					<noServer>true</noServer>
 				</configuration>
 				<executions>
