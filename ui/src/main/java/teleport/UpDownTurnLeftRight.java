@@ -17,19 +17,19 @@ public class UpDownTurnLeftRight extends CustomComponent {
 		layout.setSpacing(true);
 
 		Button up = new Button(FontAwesome.ARROW_CIRCLE_UP);
-		up.addClickListener(e -> serviceProvider.up());
+//		up.addClickListener(e -> serviceProvider.up());
 		up.setClickShortcut(KeyCode.W);
 
 		Button down = new Button(FontAwesome.ARROW_CIRCLE_DOWN);
-		down.addClickListener(e -> serviceProvider.down());
+//		down.addClickListener(e -> serviceProvider.down());
 		down.setClickShortcut(KeyCode.S);
 
 		Button left = new Button(FontAwesome.ARROW_CIRCLE_O_LEFT);
-		left.addClickListener(e -> serviceProvider.rotateLeft());
+//		left.addClickListener(e -> serviceProvider.rotateLeft());
 		left.setClickShortcut(KeyCode.A);
 
 		Button right = new Button(FontAwesome.ARROW_CIRCLE_O_RIGHT);
-		right.addClickListener(e -> serviceProvider.rotateRight());
+//		right.addClickListener(e -> serviceProvider.rotateRight());
 		right.setClickShortcut(KeyCode.D);
 
 		HorizontalLayout bottomLayout = new HorizontalLayout();

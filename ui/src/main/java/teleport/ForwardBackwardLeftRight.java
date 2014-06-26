@@ -18,19 +18,19 @@ public class ForwardBackwardLeftRight extends CustomComponent {
 		layout.setSpacing(true);
 
 		Button forward = new Button(FontAwesome.ARROW_UP);
-		forward.addClickListener(e -> serviceProvider.forward());
+//		forward.addClickListener(e -> serviceProvider.forward());
 		forward.setClickShortcut(KeyCode.ARROW_UP);
 
 		Button left = new Button(FontAwesome.ARROW_LEFT);
-		left.addClickListener(e -> serviceProvider.left());
+//		left.addClickListener(e -> serviceProvider.left());
 		left.setClickShortcut(KeyCode.ARROW_LEFT);
 
 		Button backward = new Button(FontAwesome.ARROW_DOWN);
-		backward.addClickListener(e -> serviceProvider.backward());
+//		backward.addClickListener(e -> serviceProvider.backward());
 		backward.setClickShortcut(KeyCode.ARROW_DOWN);
 
 		Button right = new Button(FontAwesome.ARROW_RIGHT);
-		right.addClickListener(e -> serviceProvider.right());
+//		right.addClickListener(e -> serviceProvider.right());
 		right.setClickShortcut(KeyCode.ARROW_RIGHT);
 
 		HorizontalLayout bottomLayout = new HorizontalLayout();

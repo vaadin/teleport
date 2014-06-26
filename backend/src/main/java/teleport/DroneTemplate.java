@@ -49,7 +49,8 @@ public class DroneTemplate {
 		}
 	}
 
-	private DatagramPacket acquireCommandPacket(DroneCommand command) throws UnknownHostException {
+	private DatagramPacket acquireCommandPacket(DroneCommand command)
+			throws UnknownHostException {
 		String stringRepresentation = command.toString();
 		System.out.println(stringRepresentation);
 		byte[] buffer = stringRepresentation.getBytes();
@@ -60,20 +61,12 @@ public class DroneTemplate {
 		return packet;
 	}
 
-	public void ascend(float f) {
-		executeCommand(new AscendCommand(commandSequenceNumber++, f));
+	public void changeAltitude(float f) {
+		executeCommand(new ChangeAltitudeCommand(commandSequenceNumber++, f));
 	}
 
-	public void descend(float f) {
-		executeCommand(new DescendCommand(commandSequenceNumber++, f));
-	}
-
-	public void rotateRight(float f) {
-		executeCommand(new RotateRightCommand(commandSequenceNumber++, f));
-	}
-
-	public void rotateLeft(float f) {
-		executeCommand(new RotateLeftCommand(commandSequenceNumber++, f));
+	public void rotate(float f) {
+		executeCommand(new RotateCommand(commandSequenceNumber++, f));
 	}
 
 	public void moveRight(float f) {
@@ -101,6 +94,7 @@ public class DroneTemplate {
 	}
 
 	public void moveByAxis(float pitch, float roll) {
-		executeCommand(new MoveByAxisCommand(commandSequenceNumber++, pitch, roll));
+		executeCommand(new MoveByAxisCommand(commandSequenceNumber++, pitch,
+				roll));
 	}
 }

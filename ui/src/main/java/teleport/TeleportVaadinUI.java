@@ -12,6 +12,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 
 @VaadinUI
 @Theme("dawn")
@@ -21,36 +22,6 @@ public class TeleportVaadinUI extends UI {
 	private DroneTemplate service = new DroneTemplate();
 
 	private DroneServiceProvider serviceProvider = new DroneServiceProvider() {
-
-		@Override
-		public void up() {
-			service.ascend(0.5f);
-		}
-
-		@Override
-		public void rotateRight() {
-			service.rotateRight(0.5f);
-		}
-
-		@Override
-		public void rotateLeft() {
-			service.rotateLeft(0.5f);
-		}
-
-		@Override
-		public void right() {
-			service.moveRight(0.5f);
-		}
-
-		@Override
-		public void left() {
-			service.moveLeft(0.5f);
-		}
-
-		@Override
-		public void down() {
-			service.descend(0.5f);
-		}
 
 		@Override
 		public void takeOff() {
@@ -63,24 +34,30 @@ public class TeleportVaadinUI extends UI {
 		}
 
 		@Override
-		public void forward() {
-			service.moveForward(0.5f);
-		}
-
-		@Override
-		public void backward() {
-			service.moveBackwards(0.5f);
-		}
-
-		@Override
 		public void moveByAxis(float pitch, float roll) {
 			service.moveByAxis(pitch, roll);
+		}
+
+		@Override
+		public void rotateByAxis(float x) {
+			service.rotate(x);
+		}
+
+		@Override
+		public void changeAltitudeByAxis(float y) {
+			service.changeAltitude(y);
 		}
 	};
 
 	@Override
 	protected void init(VaadinRequest request) {
 		setSizeFull();
+
+		VerticalLayout mainLayout = new VerticalLayout();
+		mainLayout.setSizeFull();
+		mainLayout.setSpacing(true);
+
+		setContent(mainLayout);
 
 		Button takeoff = new Button("Takeoff");
 		takeoff.addClickListener(e -> serviceProvider.takeOff());
@@ -89,28 +66,28 @@ public class TeleportVaadinUI extends UI {
 		land.addClickListener(e -> serviceProvider.land());
 		land.setClickShortcut(KeyCode.SPACEBAR);
 
-		HorizontalLayout basics = new HorizontalLayout();
-		basics.addComponents(takeoff, land);
+		HorizontalLayout buttonLayout = new HorizontalLayout();
+		buttonLayout.setSpacing(true);
 
-		HorizontalLayout layout = new HorizontalLayout();
-		layout.setSpacing(true);
+		buttonLayout.addComponents(takeoff, land);
 
-		UpDownTurnLeftRight tlr = new UpDownTurnLeftRight(serviceProvider);
+		JogDial rotation = new JogDial();
+		rotation.addAxisMoveListener(e -> serviceProvider.rotateByAxis(e.getX()));
+//		rotation.addAxisMoveListener(e -> serviceProvider
+//				.changeAltitudeByAxis(e.getY()));
 
 		JogDial movement = new JogDial();
-		movement.addAxisMoveListener(new AxisMoveListener() {
-			private static final long serialVersionUID = -4259633131223375918L;
+		movement.addAxisMoveListener(e -> serviceProvider.moveByAxis(e.getX(),
+				e.getY()));
 
-			@Override
-			public void onAxisMoved(AxisMoveEvent event) {
-				serviceProvider.moveByAxis(event.getX(), event.getY());
-			}
-		});
+		HorizontalLayout jogDialLayout = new HorizontalLayout();
+		jogDialLayout.setWidth(100, Unit.PERCENTAGE);
+		jogDialLayout.addComponents(rotation, movement);
+		jogDialLayout.setExpandRatio(movement, 1);
+		jogDialLayout.setComponentAlignment(movement, Alignment.BOTTOM_RIGHT);
 
-		layout.addComponents(basics, tlr, movement);
-
-		layout.setComponentAlignment(movement, Alignment.TOP_RIGHT);
-
-		setContent(layout);
+		mainLayout.addComponents(buttonLayout, jogDialLayout);
+		mainLayout.setExpandRatio(jogDialLayout, 1);
+		mainLayout.setComponentAlignment(jogDialLayout, Alignment.BOTTOM_LEFT);
 	}
 }
