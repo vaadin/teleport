@@ -1,91 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.vaadin</groupId>
-    <artifactId>teleport</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+	<groupId>com.vaadin</groupId>
+	<artifactId>teleport</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-    <name>Teleport</name>
-    <description>Teleport project to control droids</description>
+	<name>Teleport</name>
+	<description>Teleport project to control droids</description>
 
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.1.1.RELEASE</version>
-    </parent>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.1.1.RELEASE</version>
+	</parent>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <start-class>teleport.Application</start-class>
-        <java.version>1.8</java.version>
-        <vaadin.version>7.2.2</vaadin.version>
-        <spring-boot.version>1.1.1.RELEASE</spring-boot.version>
-    </properties>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<start-class>teleport.Application</start-class>
+		<java.version>1.8</java.version>
+		<vaadin.version>7.2.2</vaadin.version>
+		<spring-boot.version>1.1.1.RELEASE</spring-boot.version>
+	</properties>
 
-    <modules>
-        <module>backend</module>
+	<modules>
+		<module>backend</module>
+		<module>ui</module>
+	</modules>
 
-        <module>ui</module>
-    </modules>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.vaadin.spring</groupId>
-                <artifactId>spring-boot-vaadin</artifactId>
-                <version>0.0.2-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-server</artifactId>
-                <version>${vaadin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.vaadin</groupId>
-                <artifactId>vaadin-client-compiled</artifactId>
-                <version>${vaadin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.vaadin.spring</groupId>
-                <artifactId>spring-vaadin</artifactId>
-                <version>0.0.2-SNAPSHOT</version>
-            </dependency>
-            <dependency>
-                <artifactId>dawn</artifactId>
-                <groupId>org.peimari</groupId>
-                <version>1</version>
-            </dependency>
-        </dependencies>
-
-    </dependencyManagement>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-
-    <repositories>
-        <repository>
-            <id>vaadin-addons</id>
-            <url>http://maven.vaadin.com/vaadin-addons</url>
-        </repository>
-        <repository>
-            <id>vaadin-snapshots</id>
-            <url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.vaadin.spring</groupId>
+				<artifactId>spring-boot-vaadin</artifactId>
+				<version>0.0.2-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-server</artifactId>
+				<version>${vaadin.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-client-compiler</artifactId>
+				<version>${vaadin.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-client</artifactId>
+				<version>${vaadin.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.vaadin.spring</groupId>
+				<artifactId>spring-vaadin</artifactId>
+				<version>0.0.2-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<artifactId>dawn</artifactId>
+				<groupId>org.peimari</groupId>
+				<version>1</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+<!-- 
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+ -->
+	<repositories>
+		<repository>
+			<id>vaadin-addons</id>
+			<url>http://maven.vaadin.com/vaadin-addons</url>
+		</repository>
+		<repository>
+			<id>vaadin-snapshots</id>
+			<url>http://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 </project>

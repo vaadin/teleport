@@ -22,9 +22,19 @@
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client-compiled</artifactId>
+			<artifactId>vaadin-client-compiler</artifactId>
+			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-client</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>javax.validation</groupId>
+					<artifactId>validation-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 		<dependency>
 			<artifactId>dawn</artifactId>
 			<groupId>org.peimari</groupId>
@@ -34,5 +44,34 @@
 			<artifactId>backend</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.vaadin.addons</groupId>
+			<artifactId>gwt-graphics</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+<!-- 			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin> -->
+			<plugin>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-maven-plugin</artifactId>
+				<version>${vaadin.version}</version>
+				<configuration>
+					<strict>true</strict>
+					<logLevel>INFO</logLevel>
+					<extraJvmArgs>-Xmx3g -Xss2048k</extraJvmArgs>
+					<webappDirectory>${basedir}/src/main/resources/VAADIN/widgetsets</webappDirectory>
+					<runTarget>http://localhost:8080/</runTarget>
+					<hostedWebapp>${basedir}/src/main/resources/VAADIN/widgetsets</hostedWebapp>
+					<noServer>true</noServer>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
 </project>
