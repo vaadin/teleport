@@ -23,6 +23,20 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-client-compiler</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-annotations</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-servlets</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.jetty</groupId>
+					<artifactId>jetty-util</artifactId>
+				</exclusion>
+			</exclusions>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -34,6 +48,7 @@
 					<artifactId>validation-api</artifactId>
 				</exclusion>
 			</exclusions>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<artifactId>dawn</artifactId>
@@ -53,10 +68,8 @@
 
 	<build>
 		<plugins>
-<!-- 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin> -->
+			<!-- <plugin> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-maven-plugin</artifactId> 
+				</plugin> -->
 			<plugin>
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-maven-plugin</artifactId>
