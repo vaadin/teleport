@@ -45,9 +45,9 @@
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>org.vaadin.addons</groupId>
-			<artifactId>gwt-graphics</artifactId>
-			<version>1.0.0</version>
+			<groupId>com.vaadin</groupId>
+			<artifactId>jogdial-widget</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 
