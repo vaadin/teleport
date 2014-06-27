@@ -1,0 +1,3 @@
+[submodule "jogdial"]
+	path = jogdial
+	url = https://github.com/peterl1084/jogdial.git
