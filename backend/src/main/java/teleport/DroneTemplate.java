@@ -59,14 +59,13 @@ public class DroneTemplate implements InitializingBean {
                             nextCommandSequenceNumber(), gaz));
                 }
             }
-
+            
             try {
                 TimeUnit.MILLISECONDS.sleep(this.sleep);
-            } catch (InterruptedException e) {
+            }
+            catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-
-
         }
 
         executeCommand(new LandCommand(nextCommandSequenceNumber()));
