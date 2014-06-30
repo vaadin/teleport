@@ -3,11 +3,10 @@ package teleport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.touchkit.TouchKitUI;
 
-import com.vaadin.addon.touchkit.ui.TabBarView;
-import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.jogdial.JogDial;
+import com.vaadin.jogdial.client.Position;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -17,7 +16,6 @@ import com.vaadin.ui.VerticalLayout;
 
 @TouchKitUI
 @Theme("touchkit")
-@Push
 public class TeleportVaadinUI extends UI {
 	private static final long serialVersionUID = 6337889226477810842L;
 
@@ -43,10 +41,10 @@ public class TeleportVaadinUI extends UI {
 
 		buttonLayout.addComponents(takeoff, land);
 
-		JogDial rotation = new JogDial();
+		JogDial rotation = new JogDial(Position.LEFT);
 		rotation.addAxisMoveListener(e -> service.rotateByAxis(e.getX()));
 
-		JogDial movement = new JogDial();
+		JogDial movement = new JogDial(Position.RIGHT);
 		movement.addAxisMoveListener(e -> service.moveByAxis(e.getX(), e.getY()));
 
 		HorizontalLayout jogDialLayout = new HorizontalLayout();

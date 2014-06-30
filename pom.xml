@@ -26,7 +26,6 @@
 	</properties>
 
 	<modules>
-		<module>jogdial</module>
 		<module>backend</module>
 		<module>ui</module>
 	</modules>
