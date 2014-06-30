@@ -55,7 +55,8 @@ public class TeleportVaadinUI extends UI {
 
 		mainLayout.addComponents(buttonLayout, jogDialLayout);
 
-
 		setContent(mainLayout);
+		
+		service.start();
 	}
 }

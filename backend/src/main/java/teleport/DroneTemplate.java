@@ -126,6 +126,8 @@ public class DroneTemplate implements InitializingBean {
             throws UnknownHostException {
         String stringRepresentation = command.toString();
         byte[] buffer = stringRepresentation.getBytes();
+        
+        System.out.println(stringRepresentation);
 
         return new DatagramPacket(buffer, buffer.length,
                 InetAddress.getByAddress(ipBytes), DEFAULT_PORT);
