@@ -5,3 +5,5 @@ pom.xml.next
 release.properties
 *iml
 .idea
+gwt-unitCache
+widgetsets
