@@ -1,4 +1,4 @@
-package com.droid.command;
+package com.drone.command;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;

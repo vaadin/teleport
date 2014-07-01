@@ -1,4 +1,4 @@
-package com.droid;
+package com.drone;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -7,7 +7,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.vaadin.spring.boot.EnableTouchKitServlet;
 
-import com.droid.DroneTemplate;
+import com.drone.DroneTemplate;
 
 @Configuration
 @ComponentScan
@@ -22,5 +22,10 @@ public class Application {
 	@Bean
 	DroneTemplate provideTemplate() {
 		return new DroneTemplate();
+	}
+	
+	@Bean
+	Drone provideDrone() {
+		return new Drone();
 	}
 }

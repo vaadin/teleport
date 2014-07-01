@@ -1,4 +1,4 @@
-package com.droid;
+package com.drone;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -6,15 +6,12 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import com.droid.command.ChangeAltitudeCommand;
-import com.droid.command.DroneCommand;
-import com.droid.command.HoverCommand;
-import com.droid.command.LandCommand;
-import com.droid.command.MoveByAxisCommand;
-import com.droid.command.RotateByAxisCommand;
-import com.droid.command.TakeOffCommand;
-import com.droid.navdata.DroneBinaryNavData;
-import com.droid.navdata.DroneNavData;
+import com.drone.command.ChangeAltitudeCommand;
+import com.drone.command.DroneCommand;
+import com.drone.command.HoverCommand;
+import com.drone.command.LandCommand;
+import com.drone.command.MoveByAxisCommand;
+import com.drone.command.TakeOffCommand;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -29,6 +26,7 @@ public class DroneTemplate implements InitializingBean {
 
 	private static final String DEFAULT_IP = "192.168.1.1";
 	private static final int DEFAULT_PORT = 5556;
+	
 	private static final int DEFAULT_COMMAND_FPS = 10;
 
 	private final AsyncTaskExecutor taskExecutor;
@@ -37,26 +35,27 @@ public class DroneTemplate implements InitializingBean {
 	// all of these variables may be read from a thread
 	// they won't be updated by more than one
 	// client, of course, so no need for synchronization
-	private volatile boolean running;
-	private volatile int sleep;
+	private volatile boolean commandRunner;
+	private volatile int commandSleep;
 	private volatile float gaz, pitch, roll, yaw;
+	private volatile float velocityMultiplier;
 	private int commandSequenceNo = 100;
-
+	
 	// future of submitted background thread.
-	private Future<?> future;
-
+	private Future<?> commandFuture;
+	
 	// cache this to avoid DNS lookups
 	private byte[] ipBytes = new byte[4];
 
-	private final Runnable runnable = () -> {
-		while (this.running) {
+	private final Runnable commandRunnable = () -> {
+		while (this.commandRunner) {
 
 			if (isStationary()) {
 				executeCommand(new HoverCommand(nextCommandSequenceNumber()));
 			} else {
 				if (pitch != 0 || roll != 0 || yaw != 0) {
 					executeCommand(new MoveByAxisCommand(
-							nextCommandSequenceNumber(), pitch, roll, yaw));
+							nextCommandSequenceNumber(), pitch, roll, yaw, velocityMultiplier));
 				}
 				if (gaz != 0) {
 					executeCommand(new ChangeAltitudeCommand(
@@ -65,7 +64,7 @@ public class DroneTemplate implements InitializingBean {
 			}
 
 			try {
-				TimeUnit.MILLISECONDS.sleep(this.sleep);
+				TimeUnit.MILLISECONDS.sleep(this.commandSleep);
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
@@ -73,7 +72,7 @@ public class DroneTemplate implements InitializingBean {
 
 		executeCommand(new LandCommand(nextCommandSequenceNumber()));
 	};
-
+	
 	public DroneTemplate(AsyncTaskExecutor taskExecutor) {
 		this(null, DEFAULT_COMMAND_FPS, taskExecutor);
 	}
@@ -81,11 +80,8 @@ public class DroneTemplate implements InitializingBean {
 	public DroneTemplate() {
 		this(new SimpleAsyncTaskExecutor());
 	}
-	
-	
 
 	public DroneTemplate(String ip, int fps, AsyncTaskExecutor taskExecutor) {
-
 		this.taskExecutor = taskExecutor;
 		Assert.notNull(this.taskExecutor, "you must specify a TaskExecutor!");
 
@@ -97,18 +93,18 @@ public class DroneTemplate implements InitializingBean {
 	}
 
 	public void setCommandFPS(int fps) {
-		sleep = 1000 / fps;
+		commandSleep = 1000 / fps;
 	}
-
-	public Future<?> start() {
-		running = true;
-		this.future = this.taskExecutor.submit(this.runnable);
-		return this.future;
+	
+	public Future<?> startCommandRunner() {
+		commandRunner = true;
+		this.commandFuture = this.taskExecutor.submit(this.commandRunnable);
+		return this.commandFuture;
 	}
-
+	
 	public void stop() {
-		running = false;
-		Optional.of(this.future).ifPresent(future -> {
+		commandRunner = false;
+		Optional.of(this.commandFuture).ifPresent(future -> {
 			if (!(future.isCancelled() || future.isDone())) {
 				future.cancel(true);
 			}
@@ -123,10 +119,10 @@ public class DroneTemplate implements InitializingBean {
 		try (DatagramSocket socket = new DatagramSocket()) {
 			socket.send(acquireCommandPacket(command));
 		} catch (Exception ignored) {
-			// NOP since we're sending 20 per second anyway.
+			// NOP since we're sending 10 per second anyway.
 		}
 	}
-
+	
 	private DatagramPacket acquireCommandPacket(DroneCommand command)
 			throws UnknownHostException {
 		String stringRepresentation = command.toString();
@@ -152,7 +148,11 @@ public class DroneTemplate implements InitializingBean {
 
 	public void moveByAxis(float pitch, float roll) {
 		this.pitch = pitch;
-		this.roll = roll;   
+		this.roll = roll;
+	}
+	
+	public void setVelocity(double velocity) {
+		this.velocityMultiplier = (float) (velocity / 100.0);
 	}
 
 	public void takeOff() {
@@ -163,10 +163,6 @@ public class DroneTemplate implements InitializingBean {
 		executeCommand(new LandCommand(nextCommandSequenceNumber()));
 	}
 
-	public DroneNavData getLatestNavData() {
-		return new DroneBinaryNavData(null);
-	}
-
 	@Override
 	public void afterPropertiesSet() {
 		StringTokenizer st = new StringTokenizer(ip, ".");
@@ -174,7 +170,7 @@ public class DroneTemplate implements InitializingBean {
 		for (int i = 0; i < 4; i++) {
 			ipBytes[i] = (byte) Integer.parseInt(st.nextToken());
 		}
-		
-		start();
+
+		startCommandRunner();
 	}
 }

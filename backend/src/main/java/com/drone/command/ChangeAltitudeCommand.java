@@ -1,4 +1,4 @@
-package com.droid.command;
+package com.drone.command;
 
 public class ChangeAltitudeCommand extends PcmdCommand {
     public ChangeAltitudeCommand(int commandSeqNo, float gaz) {

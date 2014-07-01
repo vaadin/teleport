@@ -1,27 +1,16 @@
-package com.droid.ui.charts;
-
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.spring.UIScope;
-import org.vaadin.spring.VaadinComponent;
-import org.vaadin.spring.events.EventBus;
-import org.vaadin.spring.events.EventBusListenerMethod;
+package com.drone.ui.charts;
 
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.Labels;
 import com.vaadin.addon.charts.model.ListSeries;
-import com.vaadin.addon.charts.model.PlotOptionsGauge;
 import com.vaadin.addon.charts.model.YAxis;
 import com.vaadin.addon.charts.model.style.SolidColor;
-import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.UI;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomField;
 
-@VaadinComponent
-@UIScope
-public class BatteryLevelGauge extends CustomComponent implements
-		InitializingBean {
+public class BatteryLevelGauge extends CustomField<Double> {
 	private static final long serialVersionUID = -8976340317146040255L;
 	private Chart batterlyLevelChart;
 
@@ -29,15 +18,10 @@ public class BatteryLevelGauge extends CustomComponent implements
 
 	private ListSeries dataSeries;
 
-	@Autowired
-	private EventBus eventBus;
-
 	public BatteryLevelGauge() {
 		dataSeries = new ListSeries();
 		dataSeries.addData(0);
 		batterlyLevelChart = setupBatteryLevelChart();
-
-		setCompositionRoot(batterlyLevelChart);
 	}
 
 	private Chart setupBatteryLevelChart() {
@@ -69,9 +53,9 @@ public class BatteryLevelGauge extends CustomComponent implements
 		yAxis.setTickLength(5);
 		yAxis.setMinorTickLength(5);
 		yAxis.setEndOnTick(false);
-		
+
 		configuration.setSeries(dataSeries);
-		
+
 		configuration.addyAxis(yAxis);
 
 		batteryLevel.drawChart(configuration);
@@ -79,18 +63,17 @@ public class BatteryLevelGauge extends CustomComponent implements
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		eventBus.subscribe(this);
+	protected Component initContent() {
+		return batterlyLevelChart;
 	}
 
-	@EventBusListenerMethod
-	protected void onBatteryLevelChanged(BatteryLevelChangeEvent event) {
-		UI.getCurrent().access(new Runnable() {
+	@Override
+	public Class<? extends Double> getType() {
+		return Double.class;
+	}
 
-			@Override
-			public void run() {
-				dataSeries.updatePoint(0, event.getBatteryLevel());				
-			}
-		});
+	@Override
+	protected void setInternalValue(Double newValue) {
+		dataSeries.updatePoint(0, newValue);
 	}
 }

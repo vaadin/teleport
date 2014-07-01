@@ -1,8 +1,8 @@
-package com.droid.navdata;
+package com.drone.navdata;
 
 public interface  DroneNavData {
 
-	public boolean isHavingEnoughBattery();
+	public double getBattery();
 	
 	public float getPitch();
 	

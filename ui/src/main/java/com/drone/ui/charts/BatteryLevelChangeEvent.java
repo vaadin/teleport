@@ -1,4 +1,4 @@
-package com.droid.ui.charts;
+package com.drone.ui.charts;
 
 import java.math.BigDecimal;
 
