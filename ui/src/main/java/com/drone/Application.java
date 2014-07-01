@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.vaadin.spring.boot.EnableTouchKitServlet;
 
 import com.drone.DroneTemplate;
@@ -25,6 +27,7 @@ public class Application {
 	}
 	
 	@Bean
+	@Scope(value="singleton", proxyMode=ScopedProxyMode.TARGET_CLASS)
 	Drone provideDrone() {
 		return new Drone();
 	}

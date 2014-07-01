@@ -6,7 +6,6 @@ import org.vaadin.spring.UIScope;
 import org.vaadin.spring.VaadinComponent;
 
 import com.drone.Drone;
-import com.drone.ui.charts.BatteryLevelGauge;
 import com.vaadin.addon.touchkit.ui.Switch;
 import com.vaadin.addon.touchkit.ui.VerticalComponentGroup;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
@@ -22,7 +21,7 @@ public class ControlPanel extends CustomComponent implements InitializingBean {
 	private BeanFieldGroup<Drone> fieldGroup;
 
 	private VerticalComponentGroup layout;
-	
+
 	@Autowired
 	private Drone drone;
 
@@ -32,15 +31,12 @@ public class ControlPanel extends CustomComponent implements InitializingBean {
 	@PropertyId("maxSpeed")
 	private Slider maxSpeed;
 
-	@PropertyId("batteryLevel")
-	private BatteryLevelGauge batteryLevel;
-
 	public ControlPanel() {
 		fieldGroup = new BeanFieldGroup<>(Drone.class);
 		fieldGroup.setBuffered(false);
 
 		layout = new VerticalComponentGroup("Controls");
-		layout.setSizeFull();
+		layout.setWidth(100, Unit.PERCENTAGE);
 
 		flying = new Switch("Fly");
 
@@ -52,6 +48,8 @@ public class ControlPanel extends CustomComponent implements InitializingBean {
 		layout.addComponent(maxSpeed);
 
 		fieldGroup.bindMemberFields(this);
+		
+		addStyleName("control-panel");
 
 		setCompositionRoot(layout);
 	}

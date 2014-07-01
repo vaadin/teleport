@@ -1,6 +1,10 @@
 package com.drone;
 
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.Assert;
@@ -12,6 +16,7 @@ import com.drone.command.HoverCommand;
 import com.drone.command.LandCommand;
 import com.drone.command.MoveByAxisCommand;
 import com.drone.command.TakeOffCommand;
+import com.drone.event.DroneBatteryEvent;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -22,7 +27,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class DroneTemplate implements InitializingBean {
+public class DroneTemplate implements InitializingBean, ApplicationEventPublisherAware, ApplicationListener<ApplicationContextEvent> {
 
 	private static final String DEFAULT_IP = "192.168.1.1";
 	private static final int DEFAULT_PORT = 5556;
@@ -46,6 +51,10 @@ public class DroneTemplate implements InitializingBean {
 	
 	// cache this to avoid DNS lookups
 	private byte[] ipBytes = new byte[4];
+	
+	private ApplicationEventPublisher droneEventPublisher;
+	
+	private int droneBattery = 100;
 
 	private final Runnable commandRunnable = () -> {
 		while (this.commandRunner) {
@@ -61,6 +70,10 @@ public class DroneTemplate implements InitializingBean {
 					executeCommand(new ChangeAltitudeCommand(
 							nextCommandSequenceNumber(), gaz));
 				}
+			}
+
+			if(commandSequenceNo % 100 == 0) {
+				droneEventPublisher.publishEvent(new DroneBatteryEvent(this, droneBattery--));
 			}
 
 			try {
@@ -170,7 +183,16 @@ public class DroneTemplate implements InitializingBean {
 		for (int i = 0; i < 4; i++) {
 			ipBytes[i] = (byte) Integer.parseInt(st.nextToken());
 		}
+	}
 
+	@Override
+	public void setApplicationEventPublisher(
+			ApplicationEventPublisher applicationEventPublisher) {
+		this.droneEventPublisher = applicationEventPublisher;
+	}
+
+	@Override
+	public void onApplicationEvent(ApplicationContextEvent event) {
 		startCommandRunner();
 	}
 }

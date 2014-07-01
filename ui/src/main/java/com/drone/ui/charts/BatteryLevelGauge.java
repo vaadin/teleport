@@ -1,16 +1,20 @@
 package com.drone.ui.charts;
 
+
 import com.vaadin.addon.charts.Chart;
+import com.vaadin.addon.charts.model.Background;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.Labels;
 import com.vaadin.addon.charts.model.ListSeries;
 import com.vaadin.addon.charts.model.YAxis;
+import com.vaadin.addon.charts.model.style.Color;
 import com.vaadin.addon.charts.model.style.SolidColor;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.CustomField;
 
-public class BatteryLevelGauge extends CustomField<Double> {
+public class BatteryLevelGauge extends CustomComponent {
 	private static final long serialVersionUID = -8976340317146040255L;
 	private Chart batterlyLevelChart;
 
@@ -19,22 +23,29 @@ public class BatteryLevelGauge extends CustomField<Double> {
 	private ListSeries dataSeries;
 
 	public BatteryLevelGauge() {
+		setWidth(200, Unit.PIXELS);
+		setHeight(200, Unit.PIXELS);
+		
 		dataSeries = new ListSeries();
 		dataSeries.addData(0);
 		batterlyLevelChart = setupBatteryLevelChart();
+		
+		setCompositionRoot(batterlyLevelChart);
 	}
 
 	private Chart setupBatteryLevelChart() {
 		Chart batteryLevel = new Chart();
+		batteryLevel.setSizeFull();
 
 		Configuration configuration = new Configuration();
+		
 		configuration.getChart().setType(ChartType.GAUGE);
 		configuration.getChart().setAlignTicks(false);
 		configuration.getChart().setPlotBackgroundColor(null);
 		configuration.getChart().setPlotBackgroundImage(null);
 		configuration.getChart().setPlotBorderWidth(0);
 		configuration.getChart().setPlotShadow(false);
-		configuration.setTitle("Battery level");
+		configuration.setTitle("");
 
 		configuration.getPane().setStartAngle(-150);
 		configuration.getPane().setEndAngle(150);
@@ -61,19 +72,8 @@ public class BatteryLevelGauge extends CustomField<Double> {
 		batteryLevel.drawChart(configuration);
 		return batteryLevel;
 	}
-
-	@Override
-	protected Component initContent() {
-		return batterlyLevelChart;
-	}
-
-	@Override
-	public Class<? extends Double> getType() {
-		return Double.class;
-	}
-
-	@Override
-	protected void setInternalValue(Double newValue) {
-		dataSeries.updatePoint(0, newValue);
+	
+	public void setBatteryLevel(int batteryLevel) {
+		dataSeries.updatePoint(0, batteryLevel);
 	}
 }

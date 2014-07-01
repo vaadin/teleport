@@ -1,18 +1,27 @@
 package com.drone;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.EventBusScope;
+import org.vaadin.spring.events.EventScope;
 
+import com.drone.event.DroneEvent;
 import com.drone.navdata.DroneByteNavData;
 import com.drone.navdata.DroneNavData;
 
-public class Drone implements DroneNavData {
+public class Drone implements DroneNavData, ApplicationListener<DroneEvent> {
 	private static final double DEFAULT_MAX_SPEED = 25.0;
 
 	private boolean flying;
 	private double maxSpeed;
 
 	private DroneNavData navData;
-	
+
+	@Autowired
+	@EventBusScope(value = EventScope.APPLICATION)
+	private EventBus eventBus;
+
 	@Autowired
 	private DroneTemplate template;
 
@@ -24,7 +33,7 @@ public class Drone implements DroneNavData {
 	void setNavData(DroneNavData navData) {
 		this.navData = navData;
 	}
-	
+
 	public boolean isFlying() {
 		return flying;
 	}
@@ -47,7 +56,7 @@ public class Drone implements DroneNavData {
 	}
 
 	public double getBattery() {
-		return navData.getBattery();
+		return 75;
 	}
 
 	@Override
@@ -68,5 +77,11 @@ public class Drone implements DroneNavData {
 	@Override
 	public float getYaw() {
 		return navData.getYaw();
+	}
+
+	@Override
+	public void onApplicationEvent(DroneEvent event) {
+		System.out.println(this + " got event " + event);
+		eventBus.publish(EventScope.APPLICATION, event.getSource(), event);
 	}
 }

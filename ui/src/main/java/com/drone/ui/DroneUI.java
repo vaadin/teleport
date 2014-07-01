@@ -1,9 +1,9 @@
 package com.drone.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.vaadin.spring.touchkit.TouchKitUI;
 
-import com.drone.Drone;
 import com.drone.DroneTemplate;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
@@ -16,7 +16,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 @TouchKitUI
-@Theme("droid")
+@Theme("drone")
 @PreserveOnRefresh
 public class DroneUI extends UI {
 	private static final long serialVersionUID = 6337889226477810842L;
@@ -26,11 +26,16 @@ public class DroneUI extends UI {
 
 	@Autowired
 	private ControlPanel controlPanel;
-	
+
+	@Autowired
+	private GaugePanel gaugePanel;
+
 	private VerticalLayout mainLayout;
 
 	@Override
 	protected void init(VaadinRequest request) {
+		UI.getCurrent().setPollInterval(1000);
+
 		setSizeFull();
 
 		mainLayout = new VerticalLayout();
@@ -50,7 +55,16 @@ public class DroneUI extends UI {
 		jogDialLayout.setExpandRatio(movement, 1);
 		jogDialLayout.setComponentAlignment(movement, Alignment.BOTTOM_RIGHT);
 
-		mainLayout.addComponents(controlPanel, jogDialLayout);
+		controlPanel.setWidth(200, Unit.PIXELS);
+		gaugePanel.setWidth(100, Unit.PERCENTAGE);
+
+		HorizontalLayout topLayout = new HorizontalLayout();
+		topLayout.setWidth(100, Unit.PERCENTAGE);
+		topLayout.addComponents(controlPanel, gaugePanel);
+
+		topLayout.setExpandRatio(gaugePanel, 1);
+
+		mainLayout.addComponents(topLayout, jogDialLayout);
 		mainLayout.setExpandRatio(jogDialLayout, 1);
 		mainLayout.setComponentAlignment(jogDialLayout, Alignment.BOTTOM_LEFT);
 
