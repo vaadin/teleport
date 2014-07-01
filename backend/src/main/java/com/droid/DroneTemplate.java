@@ -29,7 +29,7 @@ public class DroneTemplate implements InitializingBean {
 
 	private static final String DEFAULT_IP = "192.168.1.1";
 	private static final int DEFAULT_PORT = 5556;
-	private static final int DEFAULT_COMMAND_FPS = 5;
+	private static final int DEFAULT_COMMAND_FPS = 10;
 
 	private final AsyncTaskExecutor taskExecutor;
 	private final String ip;
@@ -53,16 +53,10 @@ public class DroneTemplate implements InitializingBean {
 
 			if (isStationary()) {
 				executeCommand(new HoverCommand(nextCommandSequenceNumber()));
-				setCommandFPS(1);
 			} else {
-				setCommandFPS(5);
-				if (pitch != 0 || roll != 0) {
+				if (pitch != 0 || roll != 0 || yaw != 0) {
 					executeCommand(new MoveByAxisCommand(
-							nextCommandSequenceNumber(), pitch, roll));
-				}
-				if (yaw != 0) {
-					executeCommand(new RotateByAxisCommand(
-							nextCommandSequenceNumber(), yaw));
+							nextCommandSequenceNumber(), pitch, roll, yaw));
 				}
 				if (gaz != 0) {
 					executeCommand(new ChangeAltitudeCommand(
@@ -87,6 +81,8 @@ public class DroneTemplate implements InitializingBean {
 	public DroneTemplate() {
 		this(new SimpleAsyncTaskExecutor());
 	}
+	
+	
 
 	public DroneTemplate(String ip, int fps, AsyncTaskExecutor taskExecutor) {
 
@@ -126,8 +122,8 @@ public class DroneTemplate implements InitializingBean {
 	protected void executeCommand(DroneCommand command) {
 		try (DatagramSocket socket = new DatagramSocket()) {
 			socket.send(acquireCommandPacket(command));
-		} catch (Exception e) {
-			throw new RuntimeException(e);
+		} catch (Exception ignored) {
+			// NOP since we're sending 20 per second anyway.
 		}
 	}
 
@@ -156,7 +152,7 @@ public class DroneTemplate implements InitializingBean {
 
 	public void moveByAxis(float pitch, float roll) {
 		this.pitch = pitch;
-		this.roll = roll;
+		this.roll = roll;   
 	}
 
 	public void takeOff() {
@@ -178,5 +174,7 @@ public class DroneTemplate implements InitializingBean {
 		for (int i = 0; i < 4; i++) {
 			ipBytes[i] = (byte) Integer.parseInt(st.nextToken());
 		}
+		
+		start();
 	}
 }
