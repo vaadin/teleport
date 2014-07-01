@@ -44,7 +44,7 @@ public class ControlPanel extends CustomComponent implements InitializingBean {
 
 		flying = new Switch("Fly");
 
-		maxSpeed = new Slider();
+		maxSpeed = new Slider("Max speed");
 		maxSpeed.setMin(0);
 		maxSpeed.setMax(100);
 
