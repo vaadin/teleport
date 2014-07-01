@@ -1,10 +1,18 @@
-package teleport;
+package com.droid;
 
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import com.droid.command.ChangeAltitudeCommand;
+import com.droid.command.DroneCommand;
+import com.droid.command.HoverCommand;
+import com.droid.command.LandCommand;
+import com.droid.command.MoveByAxisCommand;
+import com.droid.command.RotateByAxisCommand;
+import com.droid.command.TakeOffCommand;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

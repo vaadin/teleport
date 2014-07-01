@@ -1,10 +1,10 @@
-package teleport;
+package com.droid.command;
 
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-class PcmdCommand extends DroneCommand {
+public class PcmdCommand extends DroneCommand {
 
     private float gaz, yaw, pitch, roll;
 

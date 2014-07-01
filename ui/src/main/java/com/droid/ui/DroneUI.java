@@ -1,8 +1,9 @@
-package teleport;
+package com.droid.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.touchkit.TouchKitUI;
 
+import com.droid.DroneTemplate;
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.jogdial.JogDial;
@@ -16,7 +17,7 @@ import com.vaadin.ui.VerticalLayout;
 
 @TouchKitUI
 @Theme("droid")
-public class TeleportVaadinUI extends UI {
+public class DroneUI extends UI {
 	private static final long serialVersionUID = 6337889226477810842L;
 
 	@Autowired

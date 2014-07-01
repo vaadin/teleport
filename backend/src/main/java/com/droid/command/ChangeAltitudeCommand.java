@@ -1,6 +1,6 @@
-package teleport;
+package com.droid.command;
 
-class ChangeAltitudeCommand extends PcmdCommand {
+public class ChangeAltitudeCommand extends PcmdCommand {
     public ChangeAltitudeCommand(int commandSeqNo, float gaz) {
         super(commandSeqNo, 0, 0, gaz, 0);
     }

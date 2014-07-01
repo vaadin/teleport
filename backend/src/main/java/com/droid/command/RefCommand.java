@@ -1,6 +1,6 @@
-package teleport;
+package com.droid.command;
 
-abstract class RefCommand extends DroneCommand {
+public abstract class RefCommand extends DroneCommand {
 
     private final String commandArgument;
 

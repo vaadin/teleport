@@ -1,6 +1,6 @@
-package teleport;
+package com.droid.command;
 
-class LandCommand extends RefCommand {
+public class LandCommand extends RefCommand {
 
     private static final String LANDING_COMMAND = "290717696";
 

@@ -1,6 +1,6 @@
-package teleport;
+package com.droid.command;
 
-abstract class DroneCommand {
+public abstract class DroneCommand {
 
 	public static enum CommandType {
 		REF, PCMD

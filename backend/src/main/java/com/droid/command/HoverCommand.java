@@ -1,6 +1,6 @@
-package teleport;
+package com.droid.command;
 
-class HoverCommand extends PcmdCommand {
+public class HoverCommand extends PcmdCommand {
   
 	public HoverCommand(int commandSeqNo) {
         super(commandSeqNo, 0, 0, 0, 0);

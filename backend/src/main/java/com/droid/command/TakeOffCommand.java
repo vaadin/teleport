@@ -1,6 +1,6 @@
-package teleport;
+package com.droid.command;
 
-class TakeOffCommand extends RefCommand {
+public class TakeOffCommand extends RefCommand {
 
     private static final String TAKEOFF_COMMAND = "290718208";
 
