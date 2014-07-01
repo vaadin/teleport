@@ -17,7 +17,6 @@ import com.vaadin.ui.HorizontalLayout;
 
 @VaadinComponent
 @UIScope
-@Lazy
 public class GaugePanel extends CustomComponent implements InitializingBean {
 	private static final long serialVersionUID = 4035048387445957610L;
 
@@ -53,6 +52,6 @@ public class GaugePanel extends CustomComponent implements InitializingBean {
 
 	@EventBusListenerMethod
 	protected void onBatteryLevelEvent(DroneBatteryEvent event) {
-		System.out.println(this + " got event " + event);
+		battery.setBatteryLevel(event.getBatteryLevel());
 	}
 }
