@@ -15,7 +15,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 
 @TouchKitUI
-@Theme("touchkit")
+@Theme("droid")
 public class TeleportVaadinUI extends UI {
 	private static final long serialVersionUID = 6337889226477810842L;
 
@@ -27,6 +27,7 @@ public class TeleportVaadinUI extends UI {
 		setSizeFull();
 		
 		VerticalLayout mainLayout = new VerticalLayout();
+		mainLayout.setMargin(true);
 		mainLayout.setSizeFull();
 
 		Button takeoff = new Button("Takeoff");
@@ -41,11 +42,11 @@ public class TeleportVaadinUI extends UI {
 
 		buttonLayout.addComponents(takeoff, land);
 
-		JogDial rotation = new JogDial(Position.LEFT);
-		rotation.addAxisMoveListener(e -> service.rotateByAxis(e.getX()));
+		JogDial rotation = new JogDial(Position.LEFT, 150);
+		rotation.addAxesMoveListener(e -> service.rotateByAxis(e.getX()));
 
-		JogDial movement = new JogDial(Position.RIGHT);
-		movement.addAxisMoveListener(e -> service.moveByAxis(e.getX(), e.getY()));
+		JogDial movement = new JogDial(Position.RIGHT, 150);
+		movement.addAxesMoveListener(e -> service.moveByAxis(e.getX(), e.getY()));
 
 		HorizontalLayout jogDialLayout = new HorizontalLayout();
 		jogDialLayout.setWidth(100, Unit.PERCENTAGE);
@@ -54,7 +55,9 @@ public class TeleportVaadinUI extends UI {
 		jogDialLayout.setComponentAlignment(movement, Alignment.BOTTOM_RIGHT);
 
 		mainLayout.addComponents(buttonLayout, jogDialLayout);
-
+		mainLayout.setExpandRatio(jogDialLayout, 1);
+		mainLayout.setComponentAlignment(jogDialLayout, Alignment.BOTTOM_LEFT);
+		
 		setContent(mainLayout);
 		
 		service.start();
