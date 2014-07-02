@@ -7,14 +7,15 @@ import java.util.List;
 import com.drone.Drone;
 import com.drone.GaugeConfiguration;
 import com.drone.navdata.DroneNavData;
+import com.vaadin.addon.touchkit.ui.HorizontalButtonGroup;
+import com.vaadin.addon.touchkit.ui.Popover;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 
-public class AddGaugeDialog extends Window {
+public class AddGaugeDialog extends Popover {
     private static final long serialVersionUID = -2633336549420617084L;
 
     private GaugePanel panel;
@@ -23,7 +24,6 @@ public class AddGaugeDialog extends Window {
     private ComboBox gaugeSelector;
 
     public AddGaugeDialog(GaugePanel panel, Drone drone) {
-        super("Add gauge");
         this.panel = panel;
         setWidth(200, Unit.PIXELS);
         setResizable(false);
@@ -39,6 +39,7 @@ public class AddGaugeDialog extends Window {
         List<GaugeConfiguration> availableGauges = determineAvailableGauges();
 
         gaugeSelector = new ComboBox("Gauges");
+        gaugeSelector.setWidth(100, Unit.PERCENTAGE);
         gaugeSelector.setNullSelectionAllowed(false);
         layout.addComponent(gaugeSelector);
 
@@ -48,8 +49,7 @@ public class AddGaugeDialog extends Window {
                     .property().getName());
         }
 
-        HorizontalLayout buttonLayout = new HorizontalLayout();
-        buttonLayout.setSpacing(true);
+        HorizontalButtonGroup buttonLayout = new HorizontalButtonGroup();
 
         Button add = new Button(FontAwesome.PLUS);
         Button close = new Button(FontAwesome.MINUS);
@@ -59,6 +59,8 @@ public class AddGaugeDialog extends Window {
 
         buttonLayout.addComponents(add, close);
         layout.addComponent(buttonLayout);
+
+        layout.setComponentAlignment(buttonLayout, Alignment.BOTTOM_RIGHT);
 
         setContent(layout);
     }
