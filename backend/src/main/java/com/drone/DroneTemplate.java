@@ -17,6 +17,7 @@ import com.drone.command.LandCommand;
 import com.drone.command.MoveByAxisCommand;
 import com.drone.command.ResetEmergencyCommand;
 import com.drone.command.TakeOffCommand;
+import com.drone.event.DroneControlUpdateEvent;
 import com.drone.event.DroneEmergencyEvent;
 import com.drone.event.DroneBatteryEvent;
 
@@ -173,14 +174,17 @@ public class DroneTemplate implements InitializingBean,
 
 	public void setVelocity(double velocity) {
 		this.velocityMultiplier = (float) (velocity / 100.0);
+		droneEventPublisher.publishEvent(new DroneControlUpdateEvent(this));
 	}
 
 	public void takeOff() {
 		executeCommand(new TakeOffCommand(nextCommandSequenceNumber()));
+		droneEventPublisher.publishEvent(new DroneControlUpdateEvent(this));
 	}
 
 	public void land() {
 		executeCommand(new LandCommand(nextCommandSequenceNumber()));
+		droneEventPublisher.publishEvent(new DroneControlUpdateEvent(this));
 	}
 
 	@Override
