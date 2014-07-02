@@ -79,16 +79,15 @@ public class GaugePanel extends CustomComponent implements InitializingBean,
 
     @EventBusListenerMethod
     protected void onGaugeEvent(AbstractDroneGaugeEvent event) {
-        DataGauge dataGauge = gauges.get(event.getProperty());
-
-        if (dataGauge != null) {
-            getUI().access(new Runnable() {
-                @Override
-                public void run() {
+        getUI().access(new Runnable() {
+            @Override
+            public void run() {
+                DataGauge dataGauge = gauges.get(event.getProperty());
+                if (dataGauge != null) {
                     dataGauge.setValue(event.getValue());
                 }
-            });
-        }
+            }
+        });
     }
 
     public void addGauge(GaugeConfiguration gaugeConfig) {
