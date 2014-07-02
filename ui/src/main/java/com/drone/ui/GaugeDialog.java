@@ -7,6 +7,7 @@ import java.util.List;
 import com.drone.Drone;
 import com.drone.GaugeConfiguration;
 import com.drone.navdata.DroneNavData;
+import com.drone.ui.charts.DataGauge;
 import com.vaadin.addon.touchkit.ui.HorizontalButtonGroup;
 import com.vaadin.addon.touchkit.ui.Popover;
 import com.vaadin.server.FontAwesome;
@@ -15,7 +16,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.VerticalLayout;
 
-public class AddGaugeDialog extends Popover {
+public class GaugeDialog extends Popover {
     private static final long serialVersionUID = -2633336549420617084L;
 
     private GaugePanel panel;
@@ -23,14 +24,21 @@ public class AddGaugeDialog extends Popover {
 
     private ComboBox gaugeSelector;
 
-    public AddGaugeDialog(GaugePanel panel, Drone drone) {
+    private DataGauge gauge;
+
+    public GaugeDialog(GaugePanel panel, Drone drone) {
+        this(panel, drone, null);
+    }
+
+    public GaugeDialog(GaugePanel panel, Drone drone, DataGauge gauge) {
         this.panel = panel;
-        setWidth(200, Unit.PIXELS);
+        this.gauge = gauge;
+        this.drone = drone;
+
+        setWidth(250, Unit.PIXELS);
         setResizable(false);
         setClosable(true);
         center();
-
-        this.drone = drone;
 
         VerticalLayout layout = new VerticalLayout();
         layout.setMargin(true);
@@ -51,13 +59,19 @@ public class AddGaugeDialog extends Popover {
 
         HorizontalButtonGroup buttonLayout = new HorizontalButtonGroup();
 
-        Button add = new Button(FontAwesome.PLUS);
-        Button close = new Button(FontAwesome.MINUS);
+        Button add = new Button("Add", FontAwesome.PLUS);
+        Button close = new Button("Cancel", FontAwesome.MINUS);
+        Button remove = new Button("Remove", FontAwesome.TRASH_O);
+
+        add.setVisible(gauge == null);
+        gaugeSelector.setVisible(gauge == null);
+        remove.setVisible(gauge != null);
 
         add.addClickListener(e -> onAddClicked());
-        close.addClickListener(e -> close());
+        close.addClickListener(e -> onCloseClicked());
+        remove.addClickListener(e -> onRemoveClicked());
 
-        buttonLayout.addComponents(add, close);
+        buttonLayout.addComponents(add, remove, close);
         layout.addComponent(buttonLayout);
 
         layout.setComponentAlignment(buttonLayout, Alignment.BOTTOM_RIGHT);
@@ -65,8 +79,17 @@ public class AddGaugeDialog extends Popover {
         setContent(layout);
     }
 
+    private void onRemoveClicked() {
+        panel.removeGauge(gauge);
+        close();
+    }
+
     private void onAddClicked() {
         panel.addGauge((GaugeConfiguration) gaugeSelector.getValue());
+        close();
+    }
+
+    private void onCloseClicked() {
         close();
     }
 

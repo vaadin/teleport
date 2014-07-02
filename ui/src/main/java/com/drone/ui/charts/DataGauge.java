@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import com.drone.DroneProperty;
 import com.vaadin.addon.charts.Chart;
+import com.vaadin.addon.charts.ChartClickListener;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.Labels;
@@ -37,6 +38,10 @@ public class DataGauge extends CustomField<Float> {
         dataSeries = new ListSeries();
         dataSeries.addData(0);
         gauge = setupGauge();
+    }
+
+    public void addClickListener(ChartClickListener clickListener) {
+        gauge.addChartClickListener(clickListener);
     }
 
     private Chart setupGauge() {
@@ -102,5 +107,9 @@ public class DataGauge extends CustomField<Float> {
     @Override
     public Class<? extends Float> getType() {
         return Float.class;
+    }
+
+    public DroneProperty getProperty() {
+        return property;
     }
 }

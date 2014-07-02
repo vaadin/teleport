@@ -23,8 +23,8 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.UI;
 
-@VaadinComponent
 @UIScope
+@VaadinComponent
 public class GaugePanel extends CustomComponent implements InitializingBean,
         DisposableBean {
     private static final long serialVersionUID = 4035048387445957610L;
@@ -40,6 +40,8 @@ public class GaugePanel extends CustomComponent implements InitializingBean,
     @Autowired
     private EventBus eventBus;
 
+    private GaugeDialog gaugeDialog;
+
     public GaugePanel() {
         layout = new HorizontalLayout();
         layout.setWidth(100, Unit.PERCENTAGE);
@@ -50,7 +52,7 @@ public class GaugePanel extends CustomComponent implements InitializingBean,
         setCompositionRoot(layout);
 
         Button addGauge = new Button(FontAwesome.PLUS);
-        addGauge.addClickListener(e -> showAddGaugeDialog());
+        addGauge.addClickListener(e -> showGaugeDialog());
 
         gaugeLayout = new HorizontalLayout();
         gaugeLayout.setSpacing(true);
@@ -62,11 +64,6 @@ public class GaugePanel extends CustomComponent implements InitializingBean,
         layout.setComponentAlignment(gaugeLayout, Alignment.TOP_RIGHT);
     }
 
-    private void showAddGaugeDialog() {
-        AddGaugeDialog addGaugeDialog = new AddGaugeDialog(this, drone);
-        UI.getCurrent().addWindow(addGaugeDialog);
-    }
-
     @Override
     public void afterPropertiesSet() throws Exception {
         eventBus.subscribe(this);
@@ -75,6 +72,38 @@ public class GaugePanel extends CustomComponent implements InitializingBean,
     @Override
     public void destroy() throws Exception {
         eventBus.unsubscribe(this);
+    }
+
+    public void addGauge(GaugeConfiguration gaugeConfig) {
+        if (gauges.containsKey(gaugeConfig.property())) {
+            return;
+        }
+
+        DataGauge gauge = new DataGauge(gaugeConfig.property(),
+                gaugeConfig.maxValue(), gaugeConfig.precision(), gaugeConfig
+                        .property().getName());
+        gauge.addClickListener(e -> showGaugeDialog(gauge));
+        gaugeLayout.addComponentAsFirst(gauge);
+
+        gauges.put(gaugeConfig.property(), gauge);
+    }
+
+    public void removeGauge(DataGauge gauge) {
+        gaugeLayout.removeComponent(gauge);
+        gauges.remove(gauge.getProperty());
+    }
+
+    private void showGaugeDialog() {
+        showGaugeDialog(null);
+    }
+
+    private void showGaugeDialog(DataGauge gauge) {
+        if (gaugeDialog != null) {
+            gaugeDialog.close();
+        }
+
+        gaugeDialog = new GaugeDialog(this, drone, gauge);
+        UI.getCurrent().addWindow(gaugeDialog);
     }
 
     @EventBusListenerMethod
@@ -88,18 +117,5 @@ public class GaugePanel extends CustomComponent implements InitializingBean,
                 }
             }
         });
-    }
-
-    public void addGauge(GaugeConfiguration gaugeConfig) {
-        if (gauges.containsKey(gaugeConfig.property())) {
-            return;
-        }
-
-        DataGauge gauge = new DataGauge(gaugeConfig.property(),
-                gaugeConfig.maxValue(), gaugeConfig.precision(), gaugeConfig
-                        .property().getName());
-        gaugeLayout.addComponentAsFirst(gauge);
-
-        gauges.put(gaugeConfig.property(), gauge);
     }
 }
