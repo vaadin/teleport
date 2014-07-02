@@ -8,6 +8,7 @@ import org.vaadin.spring.VaadinComponent;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.EventBusListenerMethod;
 
+import com.drone.Drone;
 import com.drone.event.DroneBatteryEvent;
 import com.drone.ui.charts.BatteryLevelGauge;
 import com.vaadin.ui.Alignment;
@@ -17,47 +18,56 @@ import com.vaadin.ui.HorizontalLayout;
 @VaadinComponent
 @UIScope
 public class GaugePanel extends CustomComponent implements InitializingBean,
-		DisposableBean {
-	private static final long serialVersionUID = 4035048387445957610L;
+        DisposableBean {
+    private static final long serialVersionUID = 4035048387445957610L;
 
-	private BatteryLevelGauge battery;
+    private BatteryLevelGauge battery;
 
-	private HorizontalLayout layout;
+    private HorizontalLayout layout;
 
-	@Autowired
-	private EventBus eventBus;
+    @Autowired
+    private Drone drone;
 
-	public GaugePanel() {
-		layout = new HorizontalLayout();
-		layout.setWidth(100, Unit.PERCENTAGE);
+    @Autowired
+    private EventBus eventBus;
 
-		battery = new BatteryLevelGauge();
-		layout.addComponent(battery);
-		layout.setExpandRatio(battery, 1);
+    public GaugePanel() {
+        layout = new HorizontalLayout();
+        layout.setWidth(100, Unit.PERCENTAGE);
 
-		layout.setComponentAlignment(battery, Alignment.TOP_RIGHT);
+        battery = new BatteryLevelGauge();
+        layout.addComponent(battery);
+        layout.setExpandRatio(battery, 1);
 
-		addStyleName("gauge-panel");
+        layout.setComponentAlignment(battery, Alignment.TOP_RIGHT);
 
-		setCompositionRoot(layout);
-	}
+        addStyleName("gauge-panel");
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		eventBus.subscribe(this);
-	}
+        setCompositionRoot(layout);
+    }
 
-	@EventBusListenerMethod
-	protected void onBatteryLevelEvent(DroneBatteryEvent event) {
-		if (event.getBatteryLevel() < 0) {
-			return;
-		}
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        eventBus.subscribe(this);
+        battery.setBatteryLevel(drone.getBattery());
+    }
 
-		battery.setBatteryLevel(event.getBatteryLevel());
-	}
+    @Override
+    public void destroy() throws Exception {
+        eventBus.unsubscribe(this);
+    }
 
-	@Override
-	public void destroy() throws Exception {
-		eventBus.unsubscribe(this);
-	}
+    @EventBusListenerMethod
+    protected void onBatteryLevelEvent(DroneBatteryEvent event) {
+        if (event.getBatteryLevel() < 0) {
+            return;
+        }
+
+        getUI().access(new Runnable() {
+            @Override
+            public void run() {
+                battery.setBatteryLevel(event.getBatteryLevel());
+            }
+        });
+    }
 }

@@ -9,26 +9,24 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.vaadin.spring.boot.EnableTouchKitServlet;
 
-import com.drone.DroneTemplate;
-
 @Configuration
 @ComponentScan
 @EnableAutoConfiguration
 @EnableTouchKitServlet
 public class Application {
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
-	@Bean
-	DroneTemplate provideTemplate() {
-		return new DroneTemplate();
-	}
-	
-	@Bean
-	@Scope(value="singleton", proxyMode=ScopedProxyMode.TARGET_CLASS)
-	Drone provideDrone() {
-		return new Drone();
-	}
+    @Bean
+    DroneTemplate provideTemplate() {
+        return new DroneTemplate();
+    }
+
+    @Bean
+    @Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
+    Drone provideDrone() {
+        return new Drone();
+    }
 }

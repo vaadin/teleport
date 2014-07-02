@@ -10,90 +10,91 @@ import com.drone.event.AbstractDroneEvent;
 import com.drone.navdata.DroneByteNavData;
 import com.drone.navdata.DroneNavData;
 
-public class Drone implements DroneNavData, ApplicationListener<AbstractDroneEvent> {
-	private static final double DEFAULT_MAX_SPEED = 25.0;
+public class Drone implements DroneNavData,
+        ApplicationListener<AbstractDroneEvent> {
+    private static final double DEFAULT_MAX_SPEED = 25.0;
 
-	private boolean flying;
-	private double maxSpeed;
+    private boolean flying;
+    private double maxSpeed;
 
-	private DroneNavData navData;
+    private DroneNavData navData;
 
-	@Autowired
-	@EventBusScope(value = EventScope.APPLICATION)
-	private EventBus eventBus;
+    @Autowired
+    @EventBusScope(value = EventScope.APPLICATION)
+    private EventBus eventBus;
 
-	@Autowired
-	private DroneTemplate template;
+    @Autowired
+    private DroneTemplate template;
 
-	public Drone() {
-		maxSpeed = DEFAULT_MAX_SPEED;
-		navData = new DroneByteNavData(null);
-	}
+    public Drone() {
+        maxSpeed = DEFAULT_MAX_SPEED;
+        navData = new DroneByteNavData(null);
+    }
 
-	void setNavData(DroneNavData navData) {
-		this.navData = navData;
-	}
+    void setNavData(DroneNavData navData) {
+        this.navData = navData;
+    }
 
-	public boolean isFlying() {
-		return flying;
-	}
+    public void resetEmergency() {
+        template.resetEmergency();
+    }
 
-	public void setFlying(boolean flying) {
-		this.flying = flying;
-		
-		if(flying) {
-			template.takeOff();
-		}
-		else {
-			template.land();
-		}
-	}
+    public boolean isFlying() {
+        return flying;
+    }
 
-	public double getMaxSpeed() {
-		return maxSpeed;
-	}
+    public void setFlying(boolean flying) {
+        this.flying = flying;
 
-	public float getMaxSpeedMultiplier() {
-		return (float) (maxSpeed / 100f);
-	}
+        if (flying) {
+            template.takeOff();
+        } else {
+            template.land();
+        }
+    }
 
-	public void setMaxSpeed(double maxSpeed) {
-		this.maxSpeed = maxSpeed;
-		template.setVelocity(maxSpeed);
-	}
+    public double getMaxSpeed() {
+        return maxSpeed;
+    }
 
-	public double getBattery() {
-		return 75;
-	}
+    public float getMaxSpeedMultiplier() {
+        return (float) (maxSpeed / 100f);
+    }
 
-	@Override
-	public float getPitch() {
-		return navData.getPitch();
-	}
+    public void setMaxSpeed(double maxSpeed) {
+        this.maxSpeed = maxSpeed;
+        template.setVelocity(maxSpeed);
+    }
 
-	@Override
-	public float getRoll() {
-		return navData.getRoll();
-	}
+    @Override
+    public int getBattery() {
+        return navData.getBattery();
+    }
 
-	@Override
-	public float getGaz() {
-		return navData.getGaz();
-	}
+    @Override
+    public float getPitch() {
+        return navData.getPitch();
+    }
 
-	@Override
-	public float getYaw() {
-		return navData.getYaw();
-	}
+    @Override
+    public float getRoll() {
+        return navData.getRoll();
+    }
 
-	@Override
-	public void onApplicationEvent(AbstractDroneEvent event) {
-		if(event.publishToUI()) {
-			eventBus.publish(EventScope.APPLICATION, event.getSource(), event);	
-		}
-	}
+    @Override
+    public float getGaz() {
+        return navData.getGaz();
+    }
 
-	public void resetEmergency() {
-		template.resetEmergency();
-	}
+    @Override
+    public float getYaw() {
+        return navData.getYaw();
+    }
+
+    @Override
+    public void onApplicationEvent(AbstractDroneEvent event) {
+        if (event.publishToUI()) {
+            eventBus.publish(EventScope.APPLICATION, event.getSource(), event);
+        }
+    }
 }

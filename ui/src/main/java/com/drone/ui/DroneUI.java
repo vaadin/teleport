@@ -9,7 +9,6 @@ import org.vaadin.spring.touchkit.TouchKitUI;
 
 import com.drone.DroneTemplate;
 import com.drone.event.DroneEmergencyEvent;
-import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.jogdial.JogDial;
 import com.vaadin.jogdial.client.Position;
@@ -21,83 +20,82 @@ import com.vaadin.ui.VerticalLayout;
 
 @TouchKitUI
 @Theme("drone")
-@PreserveOnRefresh
 public class DroneUI extends UI implements InitializingBean, DisposableBean {
-	private static final long serialVersionUID = 6337889226477810842L;
+    private static final long serialVersionUID = 6337889226477810842L;
 
-	@Autowired
-	private DroneTemplate service;
+    @Autowired
+    private DroneTemplate service;
 
-	@Autowired
-	private ControlPanel controlPanel;
+    @Autowired
+    private ControlPanel controlPanel;
 
-	@Autowired
-	private GaugePanel gaugePanel;
+    @Autowired
+    private GaugePanel gaugePanel;
 
-	@Autowired
-	private EventBus eventBus;
+    @Autowired
+    private EventBus eventBus;
 
-	private DroneEmergencyDialog emergencyDialog;
-	private VerticalLayout mainLayout;
+    private DroneEmergencyDialog emergencyDialog;
+    private VerticalLayout mainLayout;
 
-	@Override
-	protected void init(VaadinRequest request) {
-		emergencyDialog = new DroneEmergencyDialog(service);
-		
-		UI.getCurrent().setPollInterval(1000);
+    @Override
+    protected void init(VaadinRequest request) {
+        emergencyDialog = new DroneEmergencyDialog(service);
 
-		setSizeFull();
+        UI.getCurrent().setPollInterval(1000);
 
-		mainLayout = new VerticalLayout();
-		mainLayout.setMargin(true);
-		mainLayout.setSizeFull();
+        setSizeFull();
 
-		JogDial rotation = new JogDial(Position.LEFT, 150);
-		rotation.addAxesMoveListener(e -> service.rotateByAxis(e.getX() * -1));
+        mainLayout = new VerticalLayout();
+        mainLayout.setMargin(true);
+        mainLayout.setSizeFull();
 
-		JogDial movement = new JogDial(Position.RIGHT, 150);
-		movement.addAxesMoveListener(e -> service.moveByAxis(e.getX() * -1,
-				e.getY() * -1));
+        JogDial rotation = new JogDial(Position.LEFT, 150);
+        rotation.addAxesMoveListener(e -> service.rotateByAxis(e.getX() * -1));
 
-		HorizontalLayout jogDialLayout = new HorizontalLayout();
-		jogDialLayout.setWidth(100, Unit.PERCENTAGE);
-		jogDialLayout.addComponents(rotation, movement);
-		jogDialLayout.setExpandRatio(movement, 1);
-		jogDialLayout.setComponentAlignment(movement, Alignment.BOTTOM_RIGHT);
+        JogDial movement = new JogDial(Position.RIGHT, 150);
+        movement.addAxesMoveListener(e -> service.moveByAxis(e.getX() * -1,
+                e.getY() * -1));
 
-		controlPanel.setWidth(200, Unit.PIXELS);
-		gaugePanel.setWidth(100, Unit.PERCENTAGE);
+        HorizontalLayout jogDialLayout = new HorizontalLayout();
+        jogDialLayout.setWidth(100, Unit.PERCENTAGE);
+        jogDialLayout.addComponents(rotation, movement);
+        jogDialLayout.setExpandRatio(movement, 1);
+        jogDialLayout.setComponentAlignment(movement, Alignment.BOTTOM_RIGHT);
 
-		HorizontalLayout topLayout = new HorizontalLayout();
-		topLayout.setWidth(100, Unit.PERCENTAGE);
-		topLayout.addComponents(controlPanel, gaugePanel);
+        controlPanel.setWidth(200, Unit.PIXELS);
+        gaugePanel.setWidth(100, Unit.PERCENTAGE);
 
-		topLayout.setExpandRatio(gaugePanel, 1);
+        HorizontalLayout topLayout = new HorizontalLayout();
+        topLayout.setWidth(100, Unit.PERCENTAGE);
+        topLayout.addComponents(controlPanel, gaugePanel);
 
-		mainLayout.addComponents(topLayout, jogDialLayout);
-		mainLayout.setExpandRatio(jogDialLayout, 1);
-		mainLayout.setComponentAlignment(jogDialLayout, Alignment.BOTTOM_LEFT);
+        topLayout.setExpandRatio(gaugePanel, 1);
 
-		setContent(mainLayout);
-	}
+        mainLayout.addComponents(topLayout, jogDialLayout);
+        mainLayout.setExpandRatio(jogDialLayout, 1);
+        mainLayout.setComponentAlignment(jogDialLayout, Alignment.BOTTOM_LEFT);
 
-	@EventBusListenerMethod
-	protected void onEmergencyEvent(DroneEmergencyEvent event) {
-		getUI().access(new Runnable() {
-			@Override
-			public void run() {
-				emergencyDialog.show();
-			}
-		});
-	}
+        setContent(mainLayout);
+    }
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		eventBus.subscribe(this);
-	}
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        eventBus.subscribe(this);
+    }
 
-	@Override
-	public void destroy() throws Exception {
-		eventBus.unsubscribe(this);
-	}
+    @Override
+    public void destroy() throws Exception {
+        eventBus.unsubscribe(this);
+    }
+
+    @EventBusListenerMethod
+    protected void onEmergencyEvent(DroneEmergencyEvent event) {
+        getUI().access(new Runnable() {
+            @Override
+            public void run() {
+                emergencyDialog.show(getUI());
+            }
+        });
+    }
 }

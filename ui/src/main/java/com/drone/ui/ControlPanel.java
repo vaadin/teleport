@@ -19,60 +19,67 @@ import com.vaadin.ui.Slider;
 
 @VaadinComponent
 @UIScope
-public class ControlPanel extends CustomComponent implements InitializingBean, DisposableBean {
-	private static final long serialVersionUID = 8067787477217415968L;
+public class ControlPanel extends CustomComponent implements InitializingBean,
+        DisposableBean {
+    private static final long serialVersionUID = 8067787477217415968L;
 
-	private BeanFieldGroup<Drone> fieldGroup;
-	private VerticalComponentGroup layout;
+    private BeanFieldGroup<Drone> fieldGroup;
+    private VerticalComponentGroup layout;
 
-	@Autowired
-	private Drone drone;
+    @Autowired
+    private Drone drone;
 
-	@PropertyId("flying")
-	private Switch flying;
+    @PropertyId("flying")
+    private Switch flying;
 
-	@PropertyId("maxSpeed")
-	private Slider maxSpeed;
-	
-	@Autowired
-	private EventBus eventBus;
+    @PropertyId("maxSpeed")
+    private Slider maxSpeed;
 
-	public ControlPanel() {
-		fieldGroup = new BeanFieldGroup<>(Drone.class);
-		fieldGroup.setBuffered(false);
+    @Autowired
+    private EventBus eventBus;
 
-		layout = new VerticalComponentGroup("Controls");
-		layout.setWidth(100, Unit.PERCENTAGE);
+    public ControlPanel() {
+        fieldGroup = new BeanFieldGroup<>(Drone.class);
+        fieldGroup.setBuffered(false);
 
-		flying = new Switch("Fly");
+        layout = new VerticalComponentGroup("Controls");
+        layout.setWidth(100, Unit.PERCENTAGE);
 
-		maxSpeed = new Slider("Max speed");
-		maxSpeed.setMin(0);
-		maxSpeed.setMax(100);
+        flying = new Switch("Fly");
 
-		layout.addComponent(flying);
-		layout.addComponent(maxSpeed);
+        maxSpeed = new Slider("Max speed");
+        maxSpeed.setMin(0);
+        maxSpeed.setMax(100);
 
-		fieldGroup.bindMemberFields(this);
-		
-		addStyleName("control-panel");
+        layout.addComponent(flying);
+        layout.addComponent(maxSpeed);
 
-		setCompositionRoot(layout);
-	}
+        fieldGroup.bindMemberFields(this);
 
-	@EventBusListenerMethod
-	protected void onDroneControlUpdate(DroneControlUpdateEvent event) {
-		fieldGroup.setItemDataSource(drone);
-	}
-	
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		fieldGroup.setItemDataSource(drone);
-		eventBus.subscribe(this);
-	}
+        addStyleName("control-panel");
 
-	@Override
-	public void destroy() throws Exception {
-		eventBus.unsubscribe(this);
-	}
+        setCompositionRoot(layout);
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        fieldGroup.setItemDataSource(drone);
+        eventBus.subscribe(this);
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        eventBus.unsubscribe(this);
+    }
+
+    @EventBusListenerMethod
+    protected void onDroneControlUpdate(DroneControlUpdateEvent event) {
+        getUI().access(new Runnable() {
+
+            @Override
+            public void run() {
+                fieldGroup.setItemDataSource(drone);
+            }
+        });
+    }
 }

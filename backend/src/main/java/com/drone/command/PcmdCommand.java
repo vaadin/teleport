@@ -8,26 +8,28 @@ public class PcmdCommand extends DroneCommand {
 
     private float gaz, yaw, pitch, roll;
 
-    public PcmdCommand(int commandSeqNo, float pitch, float roll, float gaz, float yaw) {
+    public PcmdCommand(int commandSeqNo, float pitch, float roll, float gaz,
+            float yaw) {
         super(CommandType.PCMD, commandSeqNo);
         this.pitch = pitch;
         this.roll = roll;
         this.gaz = gaz;
         this.yaw = yaw;
-        
+
         buildCommand();
     }
 
     @Override
     protected String buildParameters() {
-        float[] vals = {pitch, roll, gaz, yaw};
+        float[] vals = { pitch, roll, gaz, yaw };
         String[] intVals = new String[vals.length];
         for (int i = 0; i < vals.length; i++) {
-            intVals[i] = vals[i] == 0 ? "0" : Integer.toString(intOfFloat(vals[i]));
+            intVals[i] = vals[i] == 0 ? "0" : Integer
+                    .toString(intOfFloat(vals[i]));
         }
         return "1," + String.join(",", intVals);
     }
-    
+
     private int intOfFloat(float f) {
         ByteBuffer bb = ByteBuffer.allocate(4);
         IntBuffer ib = bb.asIntBuffer();
@@ -35,8 +37,8 @@ public class PcmdCommand extends DroneCommand {
         fb.put(0, f);
         return ib.get(0);
     }
-    
-	public boolean isStationary() {
-		return pitch == 0 && gaz == 0 && yaw == 0 && roll == 0;
-	}
+
+    public boolean isStationary() {
+        return pitch == 0 && gaz == 0 && yaw == 0 && roll == 0;
+    }
 }
