@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.drone.Drone;
-import com.drone.DroneNavData;
 import com.drone.GaugeConfiguration;
 import com.drone.ui.charts.DataGauge;
 import com.vaadin.addon.touchkit.ui.HorizontalButtonGroup;
@@ -101,21 +100,7 @@ public class GaugeDialog extends Popover {
     private List<GaugeConfiguration> determineAvailableGauges() {
         List<GaugeConfiguration> droneProperties = new ArrayList<>();
 
-        Class<?> navDataInterface = null;
-
-        for (Class<?> droneInterface : drone.getNavData().getClass()
-                .getInterfaces()) {
-            if (droneInterface.equals(DroneNavData.class)) {
-                navDataInterface = droneInterface;
-            }
-        }
-
-        if (navDataInterface == null) {
-            throw new RuntimeException(
-                    "Drone's nav data does not implement DroneNavData interface");
-        }
-
-        for (Method method : navDataInterface.getMethods()) {
+        for (Method method : drone.getNavData().getClass().getMethods()) {
             if (method.isAnnotationPresent(GaugeConfiguration.class)) {
                 droneProperties.add(method
                         .getAnnotation(GaugeConfiguration.class));

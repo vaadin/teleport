@@ -111,9 +111,11 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
 
                     TimeUnit.MILLISECONDS.sleep(this.commandSleep);
                 } catch (InterruptedException ignored) {
-                    // The failed command will just be re sent (hopefully)
+
                 }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             executeCommand(new LandCommand(nextCommandSequenceNumber()));
         }
@@ -271,6 +273,8 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
     public void afterPropertiesSet() throws Exception {
         commandSocket = connect(DEFAULT_PORT, false, 3);
         dataSocket = connect(DEFAULT_DATA_PORT, true, 3);
+
+        startCommandRunner();
     }
 
     private InetAddress buildInetAddress(String ip) throws UnknownHostException {
