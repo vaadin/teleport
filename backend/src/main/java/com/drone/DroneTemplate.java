@@ -1,15 +1,19 @@
 package com.drone;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.Optional;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
@@ -27,20 +31,22 @@ import com.drone.command.LandCommand;
 import com.drone.command.MoveByAxisCommand;
 import com.drone.command.ResetEmergencyCommand;
 import com.drone.command.TakeOffCommand;
-import com.drone.event.ui.DroneControlUpdateEvent;
-import com.drone.event.ui.gauge.DroneAltitudeEvent;
-import com.drone.event.ui.gauge.DroneBatteryEvent;
+import com.drone.event.DroneControlUpdateEvent;
+import com.drone.event.DroneEmergencyEvent;
+import com.drone.event.DroneLowBatteryEvent;
+import com.drone.event.property.DroneAltitudeEvent;
+import com.drone.event.property.DroneBatteryEvent;
 
-public class DroneTemplate implements InitializingBean,
+public class DroneTemplate implements InitializingBean, DisposableBean,
         ApplicationEventPublisherAware,
         ApplicationListener<ApplicationContextEvent> {
     private static final String DEFAULT_IP = "192.168.1.1";
     private static final int DEFAULT_PORT = 5556;
+    private static final int DEFAULT_DATA_PORT = 5554;
 
     private static final int DEFAULT_COMMAND_FPS = 10;
 
     private final AsyncTaskExecutor taskExecutor;
-    private final String ip;
 
     // all of these variables may be read from a thread
     // they won't be updated by more than one
@@ -56,71 +62,93 @@ public class DroneTemplate implements InitializingBean,
 
     private Random random = new Random();
 
-    // cache this to avoid DNS lookups
-    private byte[] ipBytes = new byte[4];
-
     private ApplicationEventPublisher droneEventPublisher;
 
     private float droneBattery = 1;
 
+    private DatagramSocket commandSocket;
+    private DatagramSocket dataSocket;
+
+    private InetAddress address;
+
     private final Runnable commandRunnable = () -> {
-        while (this.commandRunner) {
 
-            if (isStationary()) {
-                executeCommand(new HoverCommand(nextCommandSequenceNumber()));
-            } else {
-                if (pitch != 0 || roll != 0 || yaw != 0) {
-                    executeCommand(new MoveByAxisCommand(
-                            nextCommandSequenceNumber(), pitch, roll, yaw,
-                            velocityMultiplier));
+        try {
+            while (this.commandRunner) {
+
+                DroneState droneState = getLatestState();
+
+                try {
+                    if (isStationary()) {
+                        executeCommand(new HoverCommand(
+                                nextCommandSequenceNumber()));
+                    } else {
+                        if (pitch != 0 || roll != 0 || yaw != 0) {
+                            executeCommand(new MoveByAxisCommand(
+                                    nextCommandSequenceNumber(), pitch, roll,
+                                    yaw, velocityMultiplier));
+                        }
+                        if (gaz != 0) {
+                            executeCommand(new ChangeAltitudeCommand(
+                                    nextCommandSequenceNumber(), gaz));
+                        }
+                    }
+
+                    if (commandSequenceNo % 20 == 0) {
+                        produceEmergencyEventIfNecessary(droneState);
+                        produceLowBatteryEventIfNecessary(droneState);
+                    }
+                    if (commandSequenceNo % 10 == 0) {
+                        droneEventPublisher.publishEvent(new DroneBatteryEvent(
+                                this, droneBattery -= 0.01f));
+                    }
+
+                    if (commandSequenceNo % 10 == 0) {
+                        droneEventPublisher
+                                .publishEvent(new DroneAltitudeEvent(this,
+                                        (float) random.nextDouble()));
+                    }
+
+                    TimeUnit.MILLISECONDS.sleep(this.commandSleep);
+                } catch (InterruptedException ignored) {
+                    // The failed command will just be re sent (hopefully)
                 }
-                if (gaz != 0) {
-                    executeCommand(new ChangeAltitudeCommand(
-                            nextCommandSequenceNumber(), gaz));
-                }
             }
-
-            // example events
-            // if (commandSequenceNo % 200 == 0) {
-            // droneEventPublisher.publishEvent(new DroneEmergencyEvent(this));
-            // }
-            if (commandSequenceNo % 10 == 0) {
-                droneEventPublisher.publishEvent(new DroneBatteryEvent(this,
-                        droneBattery -= 0.01f));
-            }
-
-            if (commandSequenceNo % 10 == 0) {
-                droneEventPublisher.publishEvent(new DroneAltitudeEvent(this,
-                        (float) random.nextDouble()));
-            }
-
-            try {
-                TimeUnit.MILLISECONDS.sleep(this.commandSleep);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+        } finally {
+            executeCommand(new LandCommand(nextCommandSequenceNumber()));
         }
-
-        executeCommand(new LandCommand(nextCommandSequenceNumber()));
     };
 
-    public DroneTemplate(AsyncTaskExecutor taskExecutor) {
+    public DroneTemplate(AsyncTaskExecutor taskExecutor)
+            throws UnknownHostException {
         this(null, DEFAULT_COMMAND_FPS, taskExecutor);
     }
 
-    public DroneTemplate() {
+    private void produceEmergencyEventIfNecessary(DroneState droneState) {
+        if (droneState.isEmergency()) {
+            droneEventPublisher.publishEvent(new DroneEmergencyEvent(this));
+        }
+    }
+
+    private void produceLowBatteryEventIfNecessary(DroneState droneState) {
+        if (droneState.isBatteryTooLow()) {
+            droneEventPublisher.publishEvent(new DroneLowBatteryEvent(this));
+        }
+    }
+
+    public DroneTemplate() throws UnknownHostException {
         this(new SimpleAsyncTaskExecutor());
     }
 
-    public DroneTemplate(String ip, int fps, AsyncTaskExecutor taskExecutor) {
+    public DroneTemplate(String ip, int fps, AsyncTaskExecutor taskExecutor)
+            throws UnknownHostException {
         this.taskExecutor = taskExecutor;
         Assert.notNull(this.taskExecutor, "you must specify a TaskExecutor!");
 
-        this.ip = StringUtils.hasText(ip) ? ip : DEFAULT_IP;
+        ip = StringUtils.hasText(ip) ? ip : DEFAULT_IP;
+        address = buildInetAddress(ip);
 
         setCommandFPS(fps);
-
-        afterPropertiesSet();
     }
 
     public void setCommandFPS(int fps) {
@@ -131,6 +159,19 @@ public class DroneTemplate implements InitializingBean,
         commandRunner = true;
         this.commandFuture = this.taskExecutor.submit(this.commandRunnable);
         return this.commandFuture;
+    }
+
+    private DatagramSocket connect(int port, boolean tickle, int timeoutSeconds)
+            throws Exception {
+        DatagramSocket ds = new DatagramSocket(port);
+        ds.setSoTimeout((int) TimeUnit.SECONDS.toMillis(timeoutSeconds));
+        // Assert.isTrue(ds.isConnected(), "the socket must be connected");
+
+        if (tickle) {
+            ticklePort(ds, port);
+        }
+
+        return ds;
     }
 
     public void stop() {
@@ -147,10 +188,40 @@ public class DroneTemplate implements InitializingBean,
     }
 
     protected void executeCommand(DroneCommand command) {
-        try (DatagramSocket socket = new DatagramSocket()) {
-            socket.send(acquireCommandPacket(command));
-        } catch (Exception ignored) {
-            // NOP since we're sending 10 per second anyway.
+        try {
+            commandSocket.send(acquireCommandPacket(command));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to execute command", e);
+        }
+    }
+
+    protected void ticklePort(DatagramSocket socket, int port)
+            throws UnknownHostException {
+        byte[] buf = { 0x01, 0x00, 0x00, 0x00 };
+        DatagramPacket packet = new DatagramPacket(buf, buf.length, address,
+                port);
+        try {
+            if (socket != null) {
+                socket.send(packet);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public DroneState getLatestState() {
+        try {
+            DatagramPacket packet = new DatagramPacket(new byte[2048], 2048,
+                    address, DEFAULT_DATA_PORT);
+            dataSocket.receive(packet);
+
+            ByteBuffer buffer = ByteBuffer.wrap(packet.getData(), 0,
+                    packet.getLength());
+
+            return parseDroneState(buffer);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to get latest state", e);
         }
     }
 
@@ -161,8 +232,7 @@ public class DroneTemplate implements InitializingBean,
 
         System.out.println(stringRepresentation);
 
-        return new DatagramPacket(buffer, buffer.length,
-                InetAddress.getByAddress(ipBytes), DEFAULT_PORT);
+        return new DatagramPacket(buffer, buffer.length, address, DEFAULT_PORT);
     }
 
     private boolean isStationary() {
@@ -198,12 +268,21 @@ public class DroneTemplate implements InitializingBean,
     }
 
     @Override
-    public void afterPropertiesSet() {
+    public void afterPropertiesSet() throws Exception {
+        commandSocket = connect(DEFAULT_PORT, false, 3);
+        dataSocket = connect(DEFAULT_DATA_PORT, true, 3);
+    }
+
+    private InetAddress buildInetAddress(String ip) throws UnknownHostException {
         StringTokenizer st = new StringTokenizer(ip, ".");
+
+        byte[] ipBytes = new byte[4];
 
         for (int i = 0; i < 4; i++) {
             ipBytes[i] = (byte) Integer.parseInt(st.nextToken());
         }
+
+        return InetAddress.getByAddress(ipBytes);
     }
 
     @Override
@@ -219,5 +298,24 @@ public class DroneTemplate implements InitializingBean,
 
     public void resetEmergency() {
         executeCommand(new ResetEmergencyCommand(nextCommandSequenceNumber()));
+    }
+
+    private DroneState parseDroneState(ByteBuffer b) {
+        b.order(ByteOrder.LITTLE_ENDIAN);
+        int magic = b.getInt();
+        int state = b.getInt();
+        int vision = b.getInt();
+
+        return new DroneState(state, vision);
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        if (commandSocket != null) {
+            commandSocket.close();
+        }
+        if (dataSocket != null) {
+            dataSocket.close();
+        }
     }
 }

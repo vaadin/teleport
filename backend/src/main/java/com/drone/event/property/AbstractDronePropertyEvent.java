@@ -1,13 +1,13 @@
-package com.drone.event.ui.gauge;
+package com.drone.event.property;
 
 import com.drone.DroneProperty;
-import com.drone.event.ui.AbstractDroneUIEvent;
+import com.drone.event.AbstractDroneEvent;
 
-public abstract class AbstractDroneGaugeEvent extends AbstractDroneUIEvent {
+public abstract class AbstractDronePropertyEvent extends AbstractDroneEvent {
     private static final long serialVersionUID = -8463982659175723940L;
     private final float value;
 
-    public AbstractDroneGaugeEvent(Object source, float value) {
+    public AbstractDronePropertyEvent(Object source, float value) {
         super(source);
 
         this.value = value;

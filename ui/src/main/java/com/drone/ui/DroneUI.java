@@ -8,7 +8,7 @@ import org.vaadin.spring.events.EventBusListenerMethod;
 import org.vaadin.spring.touchkit.TouchKitUI;
 
 import com.drone.DroneTemplate;
-import com.drone.event.ui.DroneEmergencyEvent;
+import com.drone.event.DroneEmergencyEvent;
 import com.vaadin.annotations.Theme;
 import com.vaadin.jogdial.JogDial;
 import com.vaadin.jogdial.client.Position;

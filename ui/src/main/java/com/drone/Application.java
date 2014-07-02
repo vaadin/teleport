@@ -1,5 +1,7 @@
 package com.drone;
 
+import java.net.UnknownHostException;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +22,7 @@ public class Application {
     }
 
     @Bean
-    DroneTemplate provideTemplate() {
+    DroneTemplate provideTemplate() throws UnknownHostException {
         return new DroneTemplate();
     }
 

@@ -8,9 +8,4 @@ public abstract class AbstractDroneEvent extends ApplicationEvent {
     public AbstractDroneEvent(Object source) {
         super(source);
     }
-
-    /**
-     * @return true if this event should be published to UI.
-     */
-    public abstract boolean publishToUI();
 }

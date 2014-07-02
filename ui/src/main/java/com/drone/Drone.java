@@ -7,11 +7,8 @@ import org.vaadin.spring.events.EventBusScope;
 import org.vaadin.spring.events.EventScope;
 
 import com.drone.event.AbstractDroneEvent;
-import com.drone.navdata.DroneByteNavData;
-import com.drone.navdata.DroneNavData;
 
-public class Drone implements DroneNavData,
-        ApplicationListener<AbstractDroneEvent> {
+public class Drone implements ApplicationListener<AbstractDroneEvent> {
     private static final double DEFAULT_MAX_SPEED = 25.0;
 
     private boolean flying;
@@ -28,7 +25,7 @@ public class Drone implements DroneNavData,
 
     public Drone() {
         maxSpeed = DEFAULT_MAX_SPEED;
-        navData = new DroneByteNavData(null);
+        navData = new DroneNavData();
     }
 
     void setNavData(DroneNavData navData) {
@@ -66,39 +63,31 @@ public class Drone implements DroneNavData,
         template.setVelocity(maxSpeed);
     }
 
-    @Override
     public int getBattery() {
         return navData.getBattery();
     }
 
-    @Override
     public float getPitch() {
         return navData.getPitch();
     }
 
-    @Override
     public float getRoll() {
         return navData.getRoll();
     }
 
-    @Override
     public float getGaz() {
         return navData.getGaz();
     }
 
-    @Override
     public float getYaw() {
         return navData.getYaw();
     }
 
     @Override
     public void onApplicationEvent(AbstractDroneEvent event) {
-        if (event.publishToUI()) {
-            eventBus.publish(EventScope.APPLICATION, event.getSource(), event);
-        }
+        eventBus.publish(EventScope.APPLICATION, event.getSource(), event);
     }
 
-    @Override
     public int getAltitude() {
         return navData.getAltitude();
     }

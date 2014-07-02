@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.drone.Drone;
+import com.drone.DroneNavData;
 import com.drone.GaugeConfiguration;
-import com.drone.navdata.DroneNavData;
 import com.drone.ui.charts.DataGauge;
 import com.vaadin.addon.touchkit.ui.HorizontalButtonGroup;
 import com.vaadin.addon.touchkit.ui.Popover;
