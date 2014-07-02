@@ -57,6 +57,11 @@ public class GaugeDialog extends Popover {
                     .property().getName());
         }
 
+        if (gaugeSelector.getContainerDataSource().size() > 0) {
+            gaugeSelector.setValue(gaugeSelector.getContainerDataSource()
+                    .getItemIds().iterator().next());
+        }
+
         HorizontalButtonGroup buttonLayout = new HorizontalButtonGroup();
 
         Button add = new Button("Add", FontAwesome.PLUS);
