@@ -15,7 +15,9 @@ import com.drone.command.DroneCommand;
 import com.drone.command.HoverCommand;
 import com.drone.command.LandCommand;
 import com.drone.command.MoveByAxisCommand;
+import com.drone.command.ResetEmergencyCommand;
 import com.drone.command.TakeOffCommand;
+import com.drone.event.DroneEmergencyEvent;
 import com.drone.event.DroneBatteryEvent;
 
 import java.net.DatagramPacket;
@@ -27,11 +29,12 @@ import java.util.StringTokenizer;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-public class DroneTemplate implements InitializingBean, ApplicationEventPublisherAware, ApplicationListener<ApplicationContextEvent> {
-
+public class DroneTemplate implements InitializingBean,
+		ApplicationEventPublisherAware,
+		ApplicationListener<ApplicationContextEvent> {
 	private static final String DEFAULT_IP = "192.168.1.1";
 	private static final int DEFAULT_PORT = 5556;
-	
+
 	private static final int DEFAULT_COMMAND_FPS = 10;
 
 	private final AsyncTaskExecutor taskExecutor;
@@ -45,15 +48,15 @@ public class DroneTemplate implements InitializingBean, ApplicationEventPublishe
 	private volatile float gaz, pitch, roll, yaw;
 	private volatile float velocityMultiplier;
 	private int commandSequenceNo = 100;
-	
+
 	// future of submitted background thread.
 	private Future<?> commandFuture;
-	
+
 	// cache this to avoid DNS lookups
 	private byte[] ipBytes = new byte[4];
-	
+
 	private ApplicationEventPublisher droneEventPublisher;
-	
+
 	private int droneBattery = 100;
 
 	private final Runnable commandRunnable = () -> {
@@ -64,7 +67,8 @@ public class DroneTemplate implements InitializingBean, ApplicationEventPublishe
 			} else {
 				if (pitch != 0 || roll != 0 || yaw != 0) {
 					executeCommand(new MoveByAxisCommand(
-							nextCommandSequenceNumber(), pitch, roll, yaw, velocityMultiplier));
+							nextCommandSequenceNumber(), pitch, roll, yaw,
+							velocityMultiplier));
 				}
 				if (gaz != 0) {
 					executeCommand(new ChangeAltitudeCommand(
@@ -72,7 +76,10 @@ public class DroneTemplate implements InitializingBean, ApplicationEventPublishe
 				}
 			}
 
-			if(commandSequenceNo % 100 == 0) {
+			if (commandSequenceNo % 200 == 0) {
+				droneEventPublisher.publishEvent(new DroneEmergencyEvent(this));
+			}
+			if (commandSequenceNo % 50 == 0) {
 				droneEventPublisher.publishEvent(new DroneBatteryEvent(this, droneBattery--));
 			}
 
@@ -85,7 +92,7 @@ public class DroneTemplate implements InitializingBean, ApplicationEventPublishe
 
 		executeCommand(new LandCommand(nextCommandSequenceNumber()));
 	};
-	
+
 	public DroneTemplate(AsyncTaskExecutor taskExecutor) {
 		this(null, DEFAULT_COMMAND_FPS, taskExecutor);
 	}
@@ -108,13 +115,13 @@ public class DroneTemplate implements InitializingBean, ApplicationEventPublishe
 	public void setCommandFPS(int fps) {
 		commandSleep = 1000 / fps;
 	}
-	
+
 	public Future<?> startCommandRunner() {
 		commandRunner = true;
 		this.commandFuture = this.taskExecutor.submit(this.commandRunnable);
 		return this.commandFuture;
 	}
-	
+
 	public void stop() {
 		commandRunner = false;
 		Optional.of(this.commandFuture).ifPresent(future -> {
@@ -135,7 +142,7 @@ public class DroneTemplate implements InitializingBean, ApplicationEventPublishe
 			// NOP since we're sending 10 per second anyway.
 		}
 	}
-	
+
 	private DatagramPacket acquireCommandPacket(DroneCommand command)
 			throws UnknownHostException {
 		String stringRepresentation = command.toString();
@@ -163,7 +170,7 @@ public class DroneTemplate implements InitializingBean, ApplicationEventPublishe
 		this.pitch = pitch;
 		this.roll = roll;
 	}
-	
+
 	public void setVelocity(double velocity) {
 		this.velocityMultiplier = (float) (velocity / 100.0);
 	}
@@ -194,5 +201,9 @@ public class DroneTemplate implements InitializingBean, ApplicationEventPublishe
 	@Override
 	public void onApplicationEvent(ApplicationContextEvent event) {
 		startCommandRunner();
+	}
+
+	public void resetEmergency() {
+		executeCommand(new ResetEmergencyCommand(nextCommandSequenceNumber()));
 	}
 }

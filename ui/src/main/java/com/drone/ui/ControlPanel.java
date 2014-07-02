@@ -19,7 +19,6 @@ public class ControlPanel extends CustomComponent implements InitializingBean {
 	private static final long serialVersionUID = 8067787477217415968L;
 
 	private BeanFieldGroup<Drone> fieldGroup;
-
 	private VerticalComponentGroup layout;
 
 	@Autowired

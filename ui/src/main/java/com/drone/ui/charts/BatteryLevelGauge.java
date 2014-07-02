@@ -1,18 +1,13 @@
 package com.drone.ui.charts;
 
-
 import com.vaadin.addon.charts.Chart;
-import com.vaadin.addon.charts.model.Background;
 import com.vaadin.addon.charts.model.ChartType;
 import com.vaadin.addon.charts.model.Configuration;
 import com.vaadin.addon.charts.model.Labels;
 import com.vaadin.addon.charts.model.ListSeries;
 import com.vaadin.addon.charts.model.YAxis;
-import com.vaadin.addon.charts.model.style.Color;
 import com.vaadin.addon.charts.model.style.SolidColor;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
-import com.vaadin.ui.CustomField;
 
 public class BatteryLevelGauge extends CustomComponent {
 	private static final long serialVersionUID = -8976340317146040255L;
@@ -25,11 +20,11 @@ public class BatteryLevelGauge extends CustomComponent {
 	public BatteryLevelGauge() {
 		setWidth(200, Unit.PIXELS);
 		setHeight(200, Unit.PIXELS);
-		
+
 		dataSeries = new ListSeries();
 		dataSeries.addData(0);
 		batterlyLevelChart = setupBatteryLevelChart();
-		
+
 		setCompositionRoot(batterlyLevelChart);
 	}
 
@@ -38,7 +33,7 @@ public class BatteryLevelGauge extends CustomComponent {
 		batteryLevel.setSizeFull();
 
 		Configuration configuration = new Configuration();
-		
+
 		configuration.getChart().setType(ChartType.GAUGE);
 		configuration.getChart().setAlignTicks(false);
 		configuration.getChart().setPlotBackgroundColor(null);
@@ -72,8 +67,14 @@ public class BatteryLevelGauge extends CustomComponent {
 		batteryLevel.drawChart(configuration);
 		return batteryLevel;
 	}
-	
+
 	public void setBatteryLevel(int batteryLevel) {
-		dataSeries.updatePoint(0, batteryLevel);
+		getUI().access(new Runnable() {
+
+			@Override
+			public void run() {
+				dataSeries.updatePoint(0, batteryLevel);
+			}
+		});
 	}
 }

@@ -1,14 +1,13 @@
 package com.drone.ui;
 
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.vaadin.spring.UIScope;
 import org.vaadin.spring.VaadinComponent;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.EventBusListenerMethod;
 
-import com.drone.Drone;
 import com.drone.event.DroneBatteryEvent;
 import com.drone.ui.charts.BatteryLevelGauge;
 import com.vaadin.ui.Alignment;
@@ -17,11 +16,9 @@ import com.vaadin.ui.HorizontalLayout;
 
 @VaadinComponent
 @UIScope
-public class GaugePanel extends CustomComponent implements InitializingBean {
+public class GaugePanel extends CustomComponent implements InitializingBean,
+		DisposableBean {
 	private static final long serialVersionUID = 4035048387445957610L;
-
-	@Autowired
-	private Drone drone;
 
 	private BatteryLevelGauge battery;
 
@@ -52,6 +49,15 @@ public class GaugePanel extends CustomComponent implements InitializingBean {
 
 	@EventBusListenerMethod
 	protected void onBatteryLevelEvent(DroneBatteryEvent event) {
+		if (event.getBatteryLevel() < 0) {
+			return;
+		}
+
 		battery.setBatteryLevel(event.getBatteryLevel());
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		eventBus.unsubscribe(this);
 	}
 }

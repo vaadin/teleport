@@ -6,11 +6,11 @@ import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.EventBusScope;
 import org.vaadin.spring.events.EventScope;
 
-import com.drone.event.DroneEvent;
+import com.drone.event.AbstractDroneEvent;
 import com.drone.navdata.DroneByteNavData;
 import com.drone.navdata.DroneNavData;
 
-public class Drone implements DroneNavData, ApplicationListener<DroneEvent> {
+public class Drone implements DroneNavData, ApplicationListener<AbstractDroneEvent> {
 	private static final double DEFAULT_MAX_SPEED = 25.0;
 
 	private boolean flying;
@@ -40,6 +40,13 @@ public class Drone implements DroneNavData, ApplicationListener<DroneEvent> {
 
 	public void setFlying(boolean flying) {
 		this.flying = flying;
+		
+		if(flying) {
+			template.takeOff();
+		}
+		else {
+			template.land();
+		}
 	}
 
 	public double getMaxSpeed() {
@@ -80,8 +87,13 @@ public class Drone implements DroneNavData, ApplicationListener<DroneEvent> {
 	}
 
 	@Override
-	public void onApplicationEvent(DroneEvent event) {
-		System.out.println(this + " got event " + event);
-		eventBus.publish(EventScope.APPLICATION, event.getSource(), event);
+	public void onApplicationEvent(AbstractDroneEvent event) {
+		if(event.publishToUI()) {
+			eventBus.publish(EventScope.APPLICATION, event.getSource(), event);	
+		}
+	}
+
+	public void resetEmergency() {
+		template.resetEmergency();
 	}
 }

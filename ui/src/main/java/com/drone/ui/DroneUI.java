@@ -1,10 +1,14 @@
 package com.drone.ui;
 
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import org.vaadin.spring.events.EventBus;
+import org.vaadin.spring.events.EventBusListenerMethod;
 import org.vaadin.spring.touchkit.TouchKitUI;
 
 import com.drone.DroneTemplate;
+import com.drone.event.DroneEmergencyEvent;
 import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.jogdial.JogDial;
@@ -18,7 +22,7 @@ import com.vaadin.ui.VerticalLayout;
 @TouchKitUI
 @Theme("drone")
 @PreserveOnRefresh
-public class DroneUI extends UI {
+public class DroneUI extends UI implements InitializingBean, DisposableBean {
 	private static final long serialVersionUID = 6337889226477810842L;
 
 	@Autowired
@@ -30,10 +34,16 @@ public class DroneUI extends UI {
 	@Autowired
 	private GaugePanel gaugePanel;
 
+	@Autowired
+	private EventBus eventBus;
+
+	private DroneEmergencyDialog emergencyDialog;
 	private VerticalLayout mainLayout;
 
 	@Override
 	protected void init(VaadinRequest request) {
+		emergencyDialog = new DroneEmergencyDialog(service);
+		
 		UI.getCurrent().setPollInterval(1000);
 
 		setSizeFull();
@@ -69,5 +79,25 @@ public class DroneUI extends UI {
 		mainLayout.setComponentAlignment(jogDialLayout, Alignment.BOTTOM_LEFT);
 
 		setContent(mainLayout);
+	}
+
+	@EventBusListenerMethod
+	protected void onEmergencyEvent(DroneEmergencyEvent event) {
+		getUI().access(new Runnable() {
+			@Override
+			public void run() {
+				emergencyDialog.show();
+			}
+		});
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		eventBus.subscribe(this);
+	}
+
+	@Override
+	public void destroy() throws Exception {
+		eventBus.unsubscribe(this);
 	}
 }
