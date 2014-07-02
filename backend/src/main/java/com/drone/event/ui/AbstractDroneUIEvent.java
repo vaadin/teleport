@@ -1,4 +1,6 @@
-package com.drone.event;
+package com.drone.event.ui;
+
+import com.drone.event.AbstractDroneEvent;
 
 public abstract class AbstractDroneUIEvent extends AbstractDroneEvent {
     private static final long serialVersionUID = -5140262378969383781L;

@@ -31,4 +31,9 @@ public class DroneByteNavData implements DroneNavData {
     public int getBattery() {
         return 0;
     }
+
+    @Override
+    public int getAltitude() {
+        return 0;
+    }
 }

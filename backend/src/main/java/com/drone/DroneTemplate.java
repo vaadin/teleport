@@ -5,6 +5,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
+import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +27,9 @@ import com.drone.command.LandCommand;
 import com.drone.command.MoveByAxisCommand;
 import com.drone.command.ResetEmergencyCommand;
 import com.drone.command.TakeOffCommand;
-import com.drone.event.DroneControlUpdateEvent;
+import com.drone.event.ui.DroneControlUpdateEvent;
+import com.drone.event.ui.gauge.DroneAltitudeEvent;
+import com.drone.event.ui.gauge.DroneBatteryEvent;
 
 public class DroneTemplate implements InitializingBean,
         ApplicationEventPublisherAware,
@@ -51,12 +54,14 @@ public class DroneTemplate implements InitializingBean,
     // future of submitted background thread.
     private Future<?> commandFuture;
 
+    private Random random = new Random();
+
     // cache this to avoid DNS lookups
     private byte[] ipBytes = new byte[4];
 
     private ApplicationEventPublisher droneEventPublisher;
 
-    private int droneBattery = 100;
+    private float droneBattery = 1;
 
     private final Runnable commandRunnable = () -> {
         while (this.commandRunner) {
@@ -79,10 +84,15 @@ public class DroneTemplate implements InitializingBean,
             // if (commandSequenceNo % 200 == 0) {
             // droneEventPublisher.publishEvent(new DroneEmergencyEvent(this));
             // }
-            // if (commandSequenceNo % 50 == 0) {
-            // droneEventPublisher.publishEvent(new DroneBatteryEvent(this,
-            // droneBattery--));
-            // }
+            if (commandSequenceNo % 10 == 0) {
+                droneEventPublisher.publishEvent(new DroneBatteryEvent(this,
+                        droneBattery -= 0.01f));
+            }
+
+            if (commandSequenceNo % 10 == 0) {
+                droneEventPublisher.publishEvent(new DroneAltitudeEvent(this,
+                        (float) random.nextDouble()));
+            }
 
             try {
                 TimeUnit.MILLISECONDS.sleep(this.commandSleep);

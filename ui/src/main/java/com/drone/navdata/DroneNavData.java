@@ -1,11 +1,15 @@
 package com.drone.navdata;
 
+import com.drone.DroneProperty;
+import com.drone.GaugeConfiguration;
+
 public interface DroneNavData {
 
-    /**
-     * @return Battery level of drone [0 - 100]
-     */
+    @GaugeConfiguration(property = DroneProperty.BATTERY, maxValue = 100, precision = 0)
     public int getBattery();
+
+    @GaugeConfiguration(property = DroneProperty.ALTITUDE, maxValue = 6, precision = 3)
+    public int getAltitude();
 
     public float getPitch();
 

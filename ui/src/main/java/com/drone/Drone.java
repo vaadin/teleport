@@ -97,4 +97,13 @@ public class Drone implements DroneNavData,
             eventBus.publish(EventScope.APPLICATION, event.getSource(), event);
         }
     }
+
+    @Override
+    public int getAltitude() {
+        return navData.getAltitude();
+    }
+
+    public DroneNavData getNavData() {
+        return navData;
+    }
 }

@@ -1,4 +1,4 @@
-package com.drone.event;
+package com.drone.event.ui;
 
 import com.drone.DroneTemplate;
 
