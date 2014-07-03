@@ -7,18 +7,14 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Optional;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.StringTokenizer;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.util.Assert;
@@ -31,15 +27,8 @@ import com.drone.command.LandCommand;
 import com.drone.command.MoveByAxisCommand;
 import com.drone.command.ResetEmergencyCommand;
 import com.drone.command.TakeOffCommand;
-import com.drone.event.DroneControlUpdateEvent;
-import com.drone.event.DroneEmergencyEvent;
-import com.drone.event.DroneLowBatteryEvent;
-import com.drone.event.property.DroneAltitudeEvent;
-import com.drone.event.property.DroneBatteryEvent;
 
-public class DroneTemplate implements InitializingBean, DisposableBean,
-        ApplicationEventPublisherAware,
-        ApplicationListener<ApplicationContextEvent> {
+public class DroneTemplate implements InitializingBean, DisposableBean {
     private static final String DEFAULT_IP = "192.168.1.1";
     private static final int DEFAULT_PORT = 5556;
     private static final int DEFAULT_DATA_PORT = 5554;
@@ -57,14 +46,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
     private volatile float velocityMultiplier;
     private int commandSequenceNo = 100;
 
-    // future of submitted background thread.
-    private Future<?> commandFuture;
-
-    private Random random = new Random();
-
-    private ApplicationEventPublisher droneEventPublisher;
-
-    private float droneBattery = 1;
+    private List<DroneStateChangeCallback> stateChangeCallbacks = new ArrayList<>();
 
     private DatagramSocket commandSocket;
     private DatagramSocket dataSocket;
@@ -75,8 +57,11 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
 
         try {
             while (this.commandRunner) {
-
-                DroneState droneState = getLatestState();
+                if (!stateChangeCallbacks.isEmpty()) {
+                    DroneState droneState = getLatestState();
+                    stateChangeCallbacks.forEach(scb -> scb
+                            .onDroneStateChanged(droneState));
+                }
 
                 try {
                     if (isStationary()) {
@@ -94,21 +79,6 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
                         }
                     }
 
-                    if (commandSequenceNo % 20 == 0) {
-                        produceEmergencyEventIfNecessary(droneState);
-                        produceLowBatteryEventIfNecessary(droneState);
-                    }
-                    if (commandSequenceNo % 10 == 0) {
-                        droneEventPublisher.publishEvent(new DroneBatteryEvent(
-                                this, droneBattery -= 0.01f));
-                    }
-
-                    if (commandSequenceNo % 10 == 0) {
-                        droneEventPublisher
-                                .publishEvent(new DroneAltitudeEvent(this,
-                                        (float) random.nextDouble()));
-                    }
-
                     TimeUnit.MILLISECONDS.sleep(this.commandSleep);
                 } catch (InterruptedException ignored) {
 
@@ -121,31 +91,22 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
         }
     };
 
-    public DroneTemplate(AsyncTaskExecutor taskExecutor)
+    public DroneTemplate(AsyncTaskExecutor taskExecutor,
+            DroneStateChangeCallback... callbacks) throws UnknownHostException {
+        this(null, DEFAULT_COMMAND_FPS, taskExecutor, callbacks);
+    }
+
+    public DroneTemplate(DroneStateChangeCallback... callbacks)
             throws UnknownHostException {
-        this(null, DEFAULT_COMMAND_FPS, taskExecutor);
+        this(new SimpleAsyncTaskExecutor(), callbacks);
     }
 
-    private void produceEmergencyEventIfNecessary(DroneState droneState) {
-        if (droneState.isEmergency()) {
-            droneEventPublisher.publishEvent(new DroneEmergencyEvent(this));
-        }
-    }
-
-    private void produceLowBatteryEventIfNecessary(DroneState droneState) {
-        if (droneState.isBatteryTooLow()) {
-            droneEventPublisher.publishEvent(new DroneLowBatteryEvent(this));
-        }
-    }
-
-    public DroneTemplate() throws UnknownHostException {
-        this(new SimpleAsyncTaskExecutor());
-    }
-
-    public DroneTemplate(String ip, int fps, AsyncTaskExecutor taskExecutor)
-            throws UnknownHostException {
+    public DroneTemplate(String ip, int fps, AsyncTaskExecutor taskExecutor,
+            DroneStateChangeCallback... callbacks) throws UnknownHostException {
         this.taskExecutor = taskExecutor;
         Assert.notNull(this.taskExecutor, "you must specify a TaskExecutor!");
+
+        stateChangeCallbacks.addAll(Arrays.asList(callbacks));
 
         ip = StringUtils.hasText(ip) ? ip : DEFAULT_IP;
         address = buildInetAddress(ip);
@@ -155,12 +116,6 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
 
     public void setCommandFPS(int fps) {
         commandSleep = 1000 / fps;
-    }
-
-    public Future<?> startCommandRunner() {
-        commandRunner = true;
-        this.commandFuture = this.taskExecutor.submit(this.commandRunnable);
-        return this.commandFuture;
     }
 
     private DatagramSocket connect(int port, boolean tickle, int timeoutSeconds)
@@ -178,11 +133,6 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
 
     public void stop() {
         commandRunner = false;
-        Optional.of(this.commandFuture).ifPresent(future -> {
-            if (!(future.isCancelled() || future.isDone())) {
-                future.cancel(true);
-            }
-        });
     }
 
     protected int nextCommandSequenceNumber() {
@@ -216,6 +166,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
         try {
             DatagramPacket packet = new DatagramPacket(new byte[2048], 2048,
                     address, DEFAULT_DATA_PORT);
+            ticklePort(dataSocket, DEFAULT_DATA_PORT);
             dataSocket.receive(packet);
 
             ByteBuffer buffer = ByteBuffer.wrap(packet.getData(), 0,
@@ -256,17 +207,14 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
 
     public void setVelocity(double velocity) {
         this.velocityMultiplier = (float) (velocity / 100.0);
-        droneEventPublisher.publishEvent(new DroneControlUpdateEvent(this));
     }
 
     public void takeOff() {
         executeCommand(new TakeOffCommand(nextCommandSequenceNumber()));
-        droneEventPublisher.publishEvent(new DroneControlUpdateEvent(this));
     }
 
     public void land() {
         executeCommand(new LandCommand(nextCommandSequenceNumber()));
-        droneEventPublisher.publishEvent(new DroneControlUpdateEvent(this));
     }
 
     @Override
@@ -274,7 +222,8 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
         commandSocket = connect(DEFAULT_PORT, false, 3);
         dataSocket = connect(DEFAULT_DATA_PORT, true, 3);
 
-        startCommandRunner();
+        commandRunner = true;
+        this.taskExecutor.submit(this.commandRunnable);
     }
 
     private InetAddress buildInetAddress(String ip) throws UnknownHostException {
@@ -287,17 +236,6 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
         }
 
         return InetAddress.getByAddress(ipBytes);
-    }
-
-    @Override
-    public void setApplicationEventPublisher(
-            ApplicationEventPublisher applicationEventPublisher) {
-        this.droneEventPublisher = applicationEventPublisher;
-    }
-
-    @Override
-    public void onApplicationEvent(ApplicationContextEvent event) {
-        startCommandRunner();
     }
 
     public void resetEmergency() {
@@ -315,6 +253,8 @@ public class DroneTemplate implements InitializingBean, DisposableBean,
 
     @Override
     public void destroy() throws Exception {
+        stop();
+
         if (commandSocket != null) {
             commandSocket.close();
         }

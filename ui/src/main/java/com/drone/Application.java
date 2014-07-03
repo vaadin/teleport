@@ -22,8 +22,9 @@ public class Application {
     }
 
     @Bean
-    DroneTemplate provideTemplate() throws UnknownHostException {
-        return new DroneTemplate();
+    DroneTemplate provideTemplate(DroneStateChangeCallback[] callback)
+            throws UnknownHostException {
+        return new DroneTemplate(callback);
     }
 
     @Bean
