@@ -24,6 +24,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import com.drone.command.ChangeAltitudeCommand;
+import com.drone.command.ConfigCommand;
 import com.drone.command.DroneCommand;
 import com.drone.command.HoverCommand;
 import com.drone.command.LandCommand;
@@ -121,16 +122,10 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
         commandSleep = 1000 / fps;
     }
 
-    private DatagramSocket connect(int port, boolean tickle, int timeoutSeconds)
+    private DatagramSocket connect(int port, int timeoutSeconds)
             throws Exception {
         DatagramSocket ds = new DatagramSocket(port);
         ds.setSoTimeout((int) TimeUnit.SECONDS.toMillis(timeoutSeconds));
-        // Assert.isTrue(ds.isConnected(), "the socket must be connected");
-
-        if (tickle) {
-            ticklePort(ds, port);
-        }
-
         return ds;
     }
 
@@ -169,7 +164,6 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
         try {
             DatagramPacket packet = new DatagramPacket(new byte[2048], 2048,
                     address, DEFAULT_DATA_PORT);
-            ticklePort(dataSocket, DEFAULT_DATA_PORT);
             dataSocket.receive(packet);
 
             ByteBuffer buffer = ByteBuffer.wrap(packet.getData(), 0,
@@ -224,10 +218,22 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
     @Override
     public void afterPropertiesSet() throws Exception {
         commandSocket = connect(DEFAULT_PORT, false, 3);
-        dataSocket = connect(DEFAULT_DATA_PORT, true, 3);
+
+        connectDataSocket(DEFAULT_DATA_PORT, 3);
 
         commandRunner = true;
         this.taskExecutor.submit(this.commandRunnable);
+    }
+
+    private void connectDataSocket(int port, int timeoutSeconds)
+            throws Exception {
+        dataSocket = connect(port, timeoutSeconds);
+        ticklePort(dataSocket, port);
+        DroneState state = getLatestState();
+
+        // int commandSeqNo, String configParam, String value
+        executeCommand(new ConfigCommand(nextCommandSequenceNumber(),
+                "general:navdata_demo", "true"));
     }
 
     private InetAddress buildInetAddress(String ip) throws UnknownHostException {
