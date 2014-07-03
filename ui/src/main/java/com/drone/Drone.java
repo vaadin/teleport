@@ -7,9 +7,11 @@ import org.vaadin.spring.events.EventScope;
 
 public class Drone {
     private static final double DEFAULT_MAX_SPEED = 25.0;
+    private static final double DEFAULT_MAX_ALTITUDE = 1.0;
 
     private boolean flying;
     private double maxSpeed;
+    private double maxAltitude;
 
     private DroneNavData navData;
 
@@ -22,6 +24,8 @@ public class Drone {
 
     public Drone() {
         maxSpeed = DEFAULT_MAX_SPEED;
+        maxAltitude = DEFAULT_MAX_ALTITUDE;
+
         navData = new DroneNavData();
     }
 
@@ -88,5 +92,14 @@ public class Drone {
 
     public DroneNavData getNavData() {
         return navData;
+    }
+
+    public double getMaxAltitude() {
+        return maxAltitude;
+    }
+
+    @BroadcastDroneCommand
+    public void setMaxAltitude(double maxAltitude) {
+        this.maxAltitude = maxAltitude;
     }
 }

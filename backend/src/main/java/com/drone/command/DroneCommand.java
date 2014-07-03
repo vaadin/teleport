@@ -4,7 +4,8 @@ public abstract class DroneCommand {
 
     public static enum CommandType {
         REF,
-        PCMD
+        PCMD,
+        CONFIG;
     }
 
     private String command;

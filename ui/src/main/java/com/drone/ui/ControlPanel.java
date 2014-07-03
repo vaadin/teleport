@@ -35,6 +35,9 @@ public class ControlPanel extends CustomComponent implements InitializingBean,
     @PropertyId("maxSpeed")
     private Slider maxSpeed;
 
+    @PropertyId("maxAltitude")
+    private Slider maxAltitude;
+
     @Autowired
     private EventBus eventBus;
 
@@ -51,8 +54,11 @@ public class ControlPanel extends CustomComponent implements InitializingBean,
         maxSpeed.setMin(0);
         maxSpeed.setMax(100);
 
-        layout.addComponent(flying);
-        layout.addComponent(maxSpeed);
+        maxAltitude = new Slider("Max altitude");
+        maxAltitude.setMin(0);
+        maxAltitude.setMax(4);
+
+        layout.addComponents(flying, maxSpeed, maxAltitude);
 
         fieldGroup.bindMemberFields(this);
 
