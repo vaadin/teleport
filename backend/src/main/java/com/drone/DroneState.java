@@ -178,4 +178,50 @@ public class DroneState {
     public int hashCode() {
         return 31 * state + 15 * vision;
     }
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+
+        sb.append("isVisionDefined: " + isVisionDefined() + "\n");
+        sb.append("isFlying: " + isFlying() + "\n");
+        sb.append("isVideoEnabled: " + isVideoEnabled() + "\n");
+        sb.append("isVisionEnabled: " + isVisionEnabled() + "\n");
+        sb.append("AltitudeControlActive: " + isAltitudeControlActive() + "\n");
+        sb.append("isUserFeedbackOn: " + isUserFeedbackOn() + "\n");
+        sb.append("ControlReceived: " + isControlReceived() + "\n");
+        sb.append("isCameraReady: " + isCameraReady() + "\n");
+        sb.append("isTravellingMask: " + isTravellingMask() + "\n");
+        sb.append("isUsbKeyReady: " + isUsbKeyReady() + "\n");
+        sb.append("isSoftwareFaultDetected: " + isSoftwareFaultDetected()
+                + "\n");
+        sb.append("isUserEmergencyLanding: " + isUserEmergencyLanding() + "\n");
+        sb.append("isMagnetoCalibrationNeeded: " + isMagnetoCalibrationNeeded()
+                + "\n");
+        sb.append("isNavDataDemoOnly: " + isNavDataDemoOnly() + "\n");
+        sb.append("isNavDataBootstrap: " + isNavDataBootstrap() + "\n");
+        sb.append("isMotorsDown: " + isMotorsDown() + "\n");
+        sb.append("isBatteryLow: " + isBatteryTooLow() + "\n");
+        sb.append("isTimerElapsed: " + isTimerElapsed() + "\n");
+        sb.append("isAngelsOutOufRange: " + isAngelsOutOufRange() + "\n");
+        sb.append("isTooMuchWind: " + isTooMuchWind() + "\n");
+        sb.append("isUltrasonicSensorDeaf: " + isUltrasonicSensorDeaf() + "\n");
+        sb.append("isCutoutSystemDetected: " + isCutoutSystemDetected() + "\n");
+        sb.append("isPICVersionNumberOK: " + isPICVersionNumberOK() + "\n");
+        sb.append("isATCodedThreadOn: " + isATCodedThreadOn() + "\n");
+        sb.append("isNavDataThreadOn: " + isNavDataThreadOn() + "\n");
+        sb.append("isVideoThreadOn: " + isVideoThreadOn() + "\n");
+        sb.append("isAcquisitionThreadOn: " + isAcquisitionThreadOn() + "\n");
+        sb.append("isControlWatchdogDelayed: " + isControlWatchdogDelayed()
+                + "\n");
+        sb.append("isADCWatchdogDelayed: " + isADCWatchdogDelayed() + "\n");
+        sb.append("isCommunicationProblemOccurred: "
+                + isCommunicationProblemOccurred() + "\n");
+        sb.append("IsEmergency: " + isEmergency() + "\n");
+        // for (int n = 0; n < options.length; n++) {
+        // sb.append(options[n]);
+        // }
+        return sb.toString();
+    }
+
 }
