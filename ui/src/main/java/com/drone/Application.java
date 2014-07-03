@@ -21,6 +21,9 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
+
+
+
     @Bean
     DroneTemplate provideTemplate(DroneStateChangeCallback[] callback)
             throws UnknownHostException {
