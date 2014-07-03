@@ -8,7 +8,7 @@ public class DroneState {
         this.state = state;
         this.vision = vision;
     }
-
+ 
     public int getStateBits() {
         return state;
     }

@@ -16,6 +16,8 @@ public abstract class DroneCommand {
     public DroneCommand(CommandType commandType, int commandSeqNo) {
         this.commandType = commandType;
         this.commandSeqNo = commandSeqNo;
+
+
     }
 
     protected void buildCommand() {

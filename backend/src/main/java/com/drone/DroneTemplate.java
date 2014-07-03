@@ -36,7 +36,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
     private volatile int commandSleep;
     private volatile float gaz, pitch, roll, yaw;
     private volatile float velocityMultiplier;
-    private int commandSequenceNo = 100;
+    private int commandSequenceNo = /*10*/0; //todo
     private int dataPort = DEFAULT_DATA_PORT;
     private List<DroneStateChangeCallback> stateChangeCallbacks = new ArrayList<>();
     private DatagramSocket commandSocket;
@@ -140,11 +140,29 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
         return commandSequenceNo++;
     }
 
+    protected void theirExecuteCommand(DatagramSocket socket, DroneCommand command) {
+        try {
+            String stringRepresentation = command.toString();
+            byte[] buffer = stringRepresentation.getBytes();
+
+            //  logger.info("Command packet " + stringRepresentation);
+
+            socket.send(new DatagramPacket(buffer, buffer.length, address, DEFAULT_PORT));
+        } catch (IOException e) {
+            logger.error("Failed to execute command", e);
+        }
+    }
+
     protected void executeCommand(DroneCommand command) {
         try {
-            commandSocket.send(acquireCommandPacket(command));
+            String stringRepresentation = command.toString();
+            byte[] buffer = stringRepresentation.getBytes();
+
+            logger.info("Command packet " + stringRepresentation);
+
+            commandSocket.send(new DatagramPacket(buffer, buffer.length, address, DEFAULT_PORT));
         } catch (IOException e) {
-            logger.warn("Failed to execute command", e);
+            logger.error("Failed to execute command", e);
         }
     }
 
@@ -182,11 +200,27 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
         return socket;
     }
 
+    private int mask;
+
+    private void setMask(boolean reset, int[] tags) {
+        int newmask = 0;
+        for (int n = 0; n < tags.length; n++) {
+            newmask |= 1 << tags[n];
+        }
+        if (reset) {
+            mask &= ~newmask;
+        } else {
+            mask |= newmask;
+        }
+//        maskChanged = true;
+    }
 
     private volatile boolean running = true;
 
     void theirRun() {
 
+        setMask(true, new int[]{DroneTemplate.DEMO_TAG,
+                DroneTemplate.RAW_MEASURES_TAG});
 
         int MAX_PACKET_SIZE = 2048;
         try (DatagramSocket datagramSocket = this.theirConnect(dataPort)) {
@@ -195,9 +229,22 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
             while (running) {
                 datagramSocket.receive(packet);
                 ByteBuffer buffer = ByteBuffer.wrap(packet.getData(), 0, packet.getLength());
+
+
                 DroneState s = parse(buffer);
+
+                System.out.println(s.toString());
+                // TODO bootstrapping probably be handled by commandmanager
+                //if (!bootstrapping && maskChanged) {
+
+                this.theirExecuteCommand(datagramSocket,
+                        new ConfigCommand(nextCommandSequenceNumber(),
+                                "general:navdata_options", mask));
+
+                // }
+
             }
-            logger.debug("Stopped " + getClass().getSimpleName());
+            logger.warn("Stopped " + getClass().getSimpleName());
 
         } catch (IOException e) {
             logger.warn("socket exception", e);
@@ -264,6 +311,12 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
 
         float v[] = getFloat(b, 3);
 
+        System.out.println(
+                String.format("batteryPercentage=%s,theta=%s, phi=%s, psi=%s,altitude=%s",
+                        batteryPercentage + "",
+                        theta + "", phi + "",
+                        psi + "", altitude + ""));
+
         @SuppressWarnings("unused")
         long num_frames = getUInt32(b);
             /* Deprecated ! Don't use ! */
@@ -281,9 +334,11 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
 			/* Deprecated ! Don't use ! */
         @SuppressWarnings("unused")
         float drone_camera_rot[] = getFloat(b, 9);
-			/* Deprecated ! Don't use ! */
+            /* Deprecated ! Don't use ! */
         @SuppressWarnings("unused")
         float drone_camera_trans[] = getFloat(b, 3);
+
+
 
          /*   if (visionListener.size() > 0 && detection_camera_type != 0) {
                 for (int i=0; i < visionListener.size(); i++)
@@ -1157,16 +1212,6 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
             logger.warn("Failed to get latest state", e);
             return null;
         }
-    }
-
-    private DatagramPacket acquireCommandPacket(DroneCommand command)
-            throws UnknownHostException {
-        String stringRepresentation = command.toString();
-        byte[] buffer = stringRepresentation.getBytes();
-
-        logger.info("Command packet " + stringRepresentation);
-
-        return new DatagramPacket(buffer, buffer.length, address, DEFAULT_PORT);
     }
 
     private boolean isStationary() {
