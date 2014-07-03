@@ -36,7 +36,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
     private volatile int commandSleep;
     private volatile float gaz, pitch, roll, yaw;
     private volatile float velocityMultiplier;
-    private int commandSequenceNo = /*10*/0; //todo
+    private int commandSequenceNo = /*10*/ 1 ; //todo
     private int dataPort = DEFAULT_DATA_PORT;
     private List<DroneStateChangeCallback> stateChangeCallbacks = new ArrayList<>();
     private DatagramSocket commandSocket;
@@ -233,7 +233,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
 
                 DroneState s = parse(buffer);
 
-                System.out.println(s.toString());
+//                System.out.println(s.toString());
                 // TODO bootstrapping probably be handled by commandmanager
                 //if (!bootstrapping && maskChanged) {
 
