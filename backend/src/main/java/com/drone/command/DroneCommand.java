@@ -5,7 +5,23 @@ public abstract class DroneCommand {
     public static enum CommandType {
         REF,
         PCMD,
-        CONFIG;
+        CONFIG,
+        CONTROL("CTRL"),
+        RESET_WATCHDOG("COMWDG");
+
+        private String name;
+
+        private CommandType() {
+            this.name = name();
+        }
+
+        private CommandType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 
     private String command;
@@ -16,7 +32,6 @@ public abstract class DroneCommand {
     public DroneCommand(CommandType commandType, int commandSeqNo) {
         this.commandType = commandType;
         this.commandSeqNo = commandSeqNo;
-
 
     }
 
