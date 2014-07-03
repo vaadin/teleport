@@ -10,9 +10,12 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -53,15 +56,15 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
 
     private InetAddress address;
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
+
     private final Runnable commandRunnable = () -> {
 
         try {
             while (this.commandRunner) {
-                if (!stateChangeCallbacks.isEmpty()) {
-                    DroneState droneState = getLatestState();
-                    stateChangeCallbacks.forEach(scb -> scb
-                            .onDroneStateChanged(droneState));
-                }
+                Optional.ofNullable(getLatestState()).ifPresent(
+                        s -> stateChangeCallbacks.forEach(scb -> scb
+                                .onDroneStateChanged(s)));
 
                 try {
                     if (isStationary()) {
@@ -85,7 +88,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error in main loop", e);
         } finally {
             executeCommand(new LandCommand(nextCommandSequenceNumber()));
         }
@@ -143,7 +146,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
         try {
             commandSocket.send(acquireCommandPacket(command));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to execute command", e);
+            logger.warn("Failed to execute command", e);
         }
     }
 
@@ -158,7 +161,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Failed to tickle port " + port, e);
         }
     }
 
@@ -174,7 +177,8 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
 
             return parseDroneState(buffer);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to get latest state", e);
+            logger.warn("Failed to get latest state", e);
+            return null;
         }
     }
 
@@ -183,7 +187,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
         String stringRepresentation = command.toString();
         byte[] buffer = stringRepresentation.getBytes();
 
-        System.out.println(stringRepresentation);
+        logger.info("Command packet " + stringRepresentation);
 
         return new DatagramPacket(buffer, buffer.length, address, DEFAULT_PORT);
     }
