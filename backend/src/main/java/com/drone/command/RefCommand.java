@@ -4,11 +4,9 @@ public abstract class RefCommand extends DroneCommand {
 
     private final String commandArgument;
 
-    public RefCommand(int commandSeqNo, String cmd) {
-        super(CommandType.REF, commandSeqNo);
+    public RefCommand(String cmd) {
+        super(CommandType.REF);
         this.commandArgument = cmd;
-
-        buildCommand();
     }
 
     @Override

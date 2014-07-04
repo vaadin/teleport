@@ -1,14 +1,15 @@
 package com.drone;
 
-import static com.drone.ReaderUtils.getBoolean;
-import static com.drone.ReaderUtils.getFloat;
-import static com.drone.ReaderUtils.getInt;
-import static com.drone.ReaderUtils.getSeconds;
-import static com.drone.ReaderUtils.getShort;
-import static com.drone.ReaderUtils.getUInt16;
-import static com.drone.ReaderUtils.getUInt32;
-import static com.drone.ReaderUtils.getUInt8;
-import static com.drone.ReaderUtils.getUSeconds;
+import com.drone.command.*;
+import com.drone.command.ControlCommand.ControlType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -23,23 +24,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.core.task.AsyncTaskExecutor;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
-import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
-
-import com.drone.command.ConfigCommand;
-import com.drone.command.ControlCommand;
-import com.drone.command.ControlCommand.ControlType;
-import com.drone.command.DroneCommand;
-import com.drone.command.LandCommand;
-import com.drone.command.ResetEmergencyCommand;
-import com.drone.command.ResetWatchdogCommand;
-import com.drone.command.TakeOffCommand;
+import static com.drone.ReaderUtils.*;
 
 public class DroneTemplate implements InitializingBean, DisposableBean {
 
@@ -68,6 +53,10 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
     private InetAddress address;
 
     private Logger logger = LoggerFactory.getLogger(getClass());
+
+
+    //////// dead code
+
 
     private final Runnable commandRunnable = () -> {
         /*-
@@ -109,7 +98,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
     };
 
     public DroneTemplate(AsyncTaskExecutor taskExecutor,
-            DroneStateChangeCallback... callbacks) throws UnknownHostException {
+                         DroneStateChangeCallback... callbacks) throws UnknownHostException {
         this(null, DEFAULT_COMMAND_FPS, taskExecutor, callbacks);
     }
 
@@ -119,7 +108,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
     }
 
     public DroneTemplate(String ip, int fps, AsyncTaskExecutor taskExecutor,
-            DroneStateChangeCallback... callbacks) throws UnknownHostException {
+                         DroneStateChangeCallback... callbacks) throws UnknownHostException {
         this.taskExecutor = taskExecutor;
         Assert.notNull(this.taskExecutor, "you must specify a TaskExecutor!");
 
@@ -178,7 +167,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
     }
 
     private void theirTicklePort(DatagramSocket socket, int port) {
-        byte[] buf = { 0x01, 0x00, 0x00, 0x00 };
+        byte[] buf = {0x01, 0x00, 0x00, 0x00};
         DatagramPacket packet = new DatagramPacket(buf, buf.length,
                 this.address, port);
         try {
@@ -193,7 +182,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
 
     protected void ticklePort(DatagramSocket socket, int port)
             throws UnknownHostException {
-        byte[] buf = { 0x01, 0x00, 0x00, 0x00 };
+        byte[] buf = {0x01, 0x00, 0x00, 0x00};
         DatagramPacket packet = new DatagramPacket(buf, buf.length, address,
                 port);
         try {
@@ -245,11 +234,11 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
             int state = buffer.getInt();
             long sequence = getUInt32(buffer);
             int vision = buffer.getInt();
-            DroneState s = new DroneState(state, vision);
+            DroneState s = new DroneState(sequence, state, vision);
 
             if (s.isNavDataBootstrap()) {
                 ConfigCommand configCommand = new ConfigCommand(
-                        nextCommandSequenceNumber(), "general:navdata_demo",
+                        "general:navdata_demo",
                         true);
                 String stringRepresentation = configCommand.toString();
                 byte[] commandBytes = stringRepresentation.getBytes();
@@ -276,8 +265,8 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
 
     private void sendControlAck(DatagramSocket datagramSocket)
             throws IOException {
-        ControlCommand controlCommand = new ControlCommand(
-                nextCommandSequenceNumber(), ControlType.ACK, 0);
+
+        ControlCommand controlCommand = new ControlCommand(ControlType.ACK, 0);
 
         String stringRepresentation = controlCommand.toString();
         byte[] commandBytes = stringRepresentation.getBytes();
@@ -297,7 +286,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
         long sequence = getUInt32(b);
         System.out.println(sequence);
         int vision = b.getInt();
-        DroneState s = new DroneState(state, vision);
+        DroneState s = new DroneState(sequence, state, vision);
 
         // if (sequence <= lastSequenceNumber && sequence != 1) {
         // // TODO sometimes we seem to receive a previous packet, find out why
@@ -855,93 +844,93 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
 
     private void parseOption(int tag, ByteBuffer optionData) {
         switch (tag) {
-        case CKS_TAG:
-            parseCksOption(optionData);
-            break;
-        case DEMO_TAG:
-            parseDemoOption(optionData);
-            break;
-        case TIME_TAG:
-            parseTimeOption(optionData);
-            break;
-        case RAW_MEASURES_TAG:
-            parseRawMeasuresOption(optionData);
-            break;
-        case PHYS_MEASURES_TAG:
-            parsePhysMeasuresOption(optionData);
-            break;
-        case GYROS_OFFSETS_TAG:
-            parseGyrosOffsetsOption(optionData);
-            break;
-        case EULER_ANGLES_TAG:
-            parseEulerAnglesOption(optionData);
-            break;
-        case REFERENCES_TAG:
-            parseReferencesOption(optionData);
-            break;
-        case TRIMS_TAG:
-            parseTrimsOption(optionData);
-            break;
-        case RC_REFERENCES_TAG:
-            parseRcReferencesOption(optionData);
-            break;
-        case PWM_TAG:
-            parsePWMOption(optionData);
-            break;
-        case ALTITUDE_TAG:
-            parseAltitudeOption(optionData);
-            break;
-        case VISION_RAW_TAG:
-            parseVisionRawOption(optionData);
-            break;
-        case VISION_OF_TAG:
-            parseVisionOfOption(optionData);
-            break;
-        case VISION_TAG:
-            parseVisionOption(optionData);
-            break;
-        case VISION_PERF_TAG:
-            parseVisionPerfOption(optionData);
-            break;
-        case TRACKERS_SEND_TAG:
-            parseTrackersSendOption(optionData);
-            break;
-        case VISION_DETECT_TAG:
-            parseVisionDetectOption(optionData);
-            break;
-        case WATCHDOG_TAG:
-            parseWatchdogOption(optionData);
-            break;
-        case ADC_DATA_FRAME_TAG:
-            parseAdcDataFrameOption(optionData);
-            break;
-        case VIDEO_STREAM_TAG:
-            parseVideoStreamOption(optionData);
-            break;
-        case GAMES_TAG:
-            parseGamesOption(optionData);
-            break;
-        case PRESSURE_RAW_TAG:
-            parsePressureOption(optionData);
-            break;
-        case MAGNETO_TAG:
-            parseMagnetoDataOption(optionData);
-            break;
-        case WIND_TAG:
-            parseWindOption(optionData);
-            break;
-        case KALMAN_PRESSURE_TAG:
-            parseKalmanPressureOption(optionData);
-            break;
-        case HDVIDEO_STREAM_TAG:
-            parseHDVideoSteamOption(optionData);
-            break;
-        case WIFI_TAG:
-            parseWifiOption(optionData);
-            break;
-        case ZIMMU_3000_TAG:
-            parseZimmu3000Option(optionData);
-            break;
+            case CKS_TAG:
+                parseCksOption(optionData);
+                break;
+            case DEMO_TAG:
+                parseDemoOption(optionData);
+                break;
+            case TIME_TAG:
+                parseTimeOption(optionData);
+                break;
+            case RAW_MEASURES_TAG:
+                parseRawMeasuresOption(optionData);
+                break;
+            case PHYS_MEASURES_TAG:
+                parsePhysMeasuresOption(optionData);
+                break;
+            case GYROS_OFFSETS_TAG:
+                parseGyrosOffsetsOption(optionData);
+                break;
+            case EULER_ANGLES_TAG:
+                parseEulerAnglesOption(optionData);
+                break;
+            case REFERENCES_TAG:
+                parseReferencesOption(optionData);
+                break;
+            case TRIMS_TAG:
+                parseTrimsOption(optionData);
+                break;
+            case RC_REFERENCES_TAG:
+                parseRcReferencesOption(optionData);
+                break;
+            case PWM_TAG:
+                parsePWMOption(optionData);
+                break;
+            case ALTITUDE_TAG:
+                parseAltitudeOption(optionData);
+                break;
+            case VISION_RAW_TAG:
+                parseVisionRawOption(optionData);
+                break;
+            case VISION_OF_TAG:
+                parseVisionOfOption(optionData);
+                break;
+            case VISION_TAG:
+                parseVisionOption(optionData);
+                break;
+            case VISION_PERF_TAG:
+                parseVisionPerfOption(optionData);
+                break;
+            case TRACKERS_SEND_TAG:
+                parseTrackersSendOption(optionData);
+                break;
+            case VISION_DETECT_TAG:
+                parseVisionDetectOption(optionData);
+                break;
+            case WATCHDOG_TAG:
+                parseWatchdogOption(optionData);
+                break;
+            case ADC_DATA_FRAME_TAG:
+                parseAdcDataFrameOption(optionData);
+                break;
+            case VIDEO_STREAM_TAG:
+                parseVideoStreamOption(optionData);
+                break;
+            case GAMES_TAG:
+                parseGamesOption(optionData);
+                break;
+            case PRESSURE_RAW_TAG:
+                parsePressureOption(optionData);
+                break;
+            case MAGNETO_TAG:
+                parseMagnetoDataOption(optionData);
+                break;
+            case WIND_TAG:
+                parseWindOption(optionData);
+                break;
+            case KALMAN_PRESSURE_TAG:
+                parseKalmanPressureOption(optionData);
+                break;
+            case HDVIDEO_STREAM_TAG:
+                parseHDVideoSteamOption(optionData);
+                break;
+            case WIFI_TAG:
+                parseWifiOption(optionData);
+                break;
+            case ZIMMU_3000_TAG:
+                parseZimmu3000Option(optionData);
+                break;
         }
 
     }
@@ -1270,8 +1259,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
 
             if (state.isCommunicationProblemOccurred()) {
                 System.err.println("COMMUNICATION ERROR; RESET WATCH DOGGIE");
-                ResetWatchdogCommand reset = new ResetWatchdogCommand(
-                        nextCommandSequenceNumber());
+                ResetWatchdogCommand reset = new ResetWatchdogCommand( );
                 String stringRepresentation = reset.toString();
                 byte[] commandBytes = stringRepresentation.getBytes();
 
@@ -1308,11 +1296,11 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
     }
 
     public void takeOff() {
-        executeCommand(new TakeOffCommand(nextCommandSequenceNumber()));
+        executeCommand(new TakeOffCommand());
     }
 
     public void land() {
-        executeCommand(new LandCommand(nextCommandSequenceNumber()));
+        executeCommand(new LandCommand());
     }
 
     @Override
@@ -1328,7 +1316,7 @@ public class DroneTemplate implements InitializingBean, DisposableBean {
     }
 
     public void resetEmergency() {
-        executeCommand(new ResetEmergencyCommand(nextCommandSequenceNumber()));
+        executeCommand(new ResetEmergencyCommand());
     }
 
     @Override

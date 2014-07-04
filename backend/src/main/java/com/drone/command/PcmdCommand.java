@@ -9,16 +9,15 @@ public class PcmdCommand extends DroneCommand {
 
     private float gaz, yaw, pitch, roll;
 
-    public PcmdCommand(int commandSeqNo, float pitch, float roll, float gaz,
+    public PcmdCommand(   float pitch, float roll, float gaz,
             float yaw) {
-        super(CommandType.PCMD, commandSeqNo);
+        super(CommandType.PCMD );
         this.pitch = pitch;
         this.roll = roll;
         this.gaz = gaz;
         this.yaw = yaw;
 
-        buildCommand();
-    }
+     }
 
     @Override
     protected String buildParameters() {

@@ -15,12 +15,12 @@ public class ControlCommand extends DroneCommand {
     private ControlType controlType;
     private int value;
 
-    public ControlCommand(int commandSeqNo, ControlType controlType, int value) {
-        super(CommandType.CONTROL, commandSeqNo);
+    public ControlCommand( ControlType controlType, int value) {
+        super(CommandType.CONTROL );
         this.controlType = controlType;
         this.value = value;
 
-        buildCommand();
+
     }
 
     @Override

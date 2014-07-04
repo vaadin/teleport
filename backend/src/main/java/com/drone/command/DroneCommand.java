@@ -1,6 +1,8 @@
 package com.drone.command;
 
-public abstract class DroneCommand {
+import org.springframework.core.Ordered;
+
+public abstract class DroneCommand implements Ordered {
 
     public static enum CommandType {
         REF,
@@ -18,31 +20,38 @@ public abstract class DroneCommand {
         private CommandType(String name) {
             this.name = name;
         }
-
-        public String getName() {
-            return name;
-        }
     }
-
-    private String command;
 
     private CommandType commandType;
-    private int commandSeqNo;
 
-    public DroneCommand(CommandType commandType, int commandSeqNo) {
-        this.commandType = commandType;
-        this.commandSeqNo = commandSeqNo;
-
+    private int order;
+    public DroneCommand(CommandType commandType) {
+        this(commandType, 0);
     }
 
-    protected void buildCommand() {
-        this.command = "AT*" + commandType.name() + "=" + commandSeqNo + ","
+    public boolean needControlAck() {
+        return false;
+    }
+
+    public boolean isRepeated() {
+        return false;
+    }
+
+
+    protected DroneCommand(CommandType commandType, int order) {
+        this.commandType = commandType;
+        this.order = order;
+    }
+
+    public String buildCommand(int commandSeqNo) {
+        return "AT*" + commandType.name() + "=" + commandSeqNo + ","
                 + buildParameters() + "\r";
     }
 
+
     @Override
-    public String toString() {
-        return this.command;
+    public int getOrder() {
+        return this.order;
     }
 
     protected abstract String buildParameters();

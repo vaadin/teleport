@@ -4,6 +4,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 
 import java.net.UnknownHostException;
 
@@ -13,15 +15,19 @@ public class Main {
     public static class DroneClientConfiguration {
 
         @Bean
-        DroneTemplate provideDroneTemplate() throws UnknownHostException {
-            DroneStateChangeCallback listener =
-                    latestState -> System.out.println("the latest state is: " + latestState);
-            return new DroneTemplate(listener);
+        TaskExecutor taskExecutor (){
+            return new SimpleAsyncTaskExecutor();
+        }
+
+        @Bean
+        DroneTemplate2 provideDroneTemplate(TaskExecutor taskExecutor ) throws UnknownHostException {
+            DroneStateChangeCallback listener = latestState -> System.out.println("the latest state is: " + latestState);
+            return new DroneTemplate2 (  taskExecutor );
         }
     }
 
     public static void main(String[] args) throws Throwable {
-        ApplicationContext applicationContext =
-                new AnnotationConfigApplicationContext(DroneClientConfiguration.class);
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(DroneClientConfiguration.class);
+        applicationContext.start();
     }
 }

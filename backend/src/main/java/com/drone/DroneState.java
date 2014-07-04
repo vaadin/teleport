@@ -1,10 +1,12 @@
 package com.drone;
 
 public class DroneState {
+    private final long sequenceNumber;
     private final int state;
     private final int vision;
 
-    public DroneState(int state, int vision) {
+    public DroneState( long seqNo, int state, int vision  ) {
+        this.sequenceNumber = seqNo;
         this.state = state;
         this.vision = vision;
     }
