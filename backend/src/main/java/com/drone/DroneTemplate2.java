@@ -116,6 +116,22 @@ public class DroneTemplate2 implements Lifecycle {
         }
     }
 
+
+    private  int buildOptionMask (boolean reset, int ... tags) {
+        int mask  =  0 ;
+        int newmask = 0;
+        for (int n = 0; n < tags.length; n++) {
+            newmask |= 1 << tags[n];
+        }
+        if (reset) {
+            mask &= ~newmask;
+        } else {
+            mask |= newmask;
+        }
+        // maskChanged = true;
+        return mask ;
+    }
+
     private void commandLoop(InetAddress address, DatagramSocket socket, int commandPort) throws Exception {
         DroneCommand ack = new ControlCommand(ControlCommand.ControlType.ACK, 0);
         DroneCommand keepAlive = new ResetWatchdogCommand();
@@ -210,8 +226,6 @@ public class DroneTemplate2 implements Lifecycle {
                 throw new RuntimeException(e);
             }
         });
-
-
     }
 
 
