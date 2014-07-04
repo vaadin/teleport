@@ -55,7 +55,7 @@ public class DroneUI extends UI implements InitializingBean, DisposableBean {
         JogDial rotation = new JogDial(Position.LEFT, 150);
         rotation.addAxesMoveListener(e -> {
             yaw = -e.getX();
-            gaz = -e.getY();
+            gaz = e.getY();
             service.move(yaw, pitch, roll, gaz);
         });
 

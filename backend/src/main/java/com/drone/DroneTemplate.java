@@ -430,6 +430,6 @@ public class DroneTemplate implements Lifecycle {
 
     public void move(float yaw, float pitch, float roll, float gaz) {
         System.out.println(yaw + " " + pitch + " " + roll + " " + gaz);
-        enqueueCommand(new MoveByAxisCommand(pitch, roll, yaw, gaz, 1f));
+        enqueueCommand(new MoveByAxisCommand(pitch, roll, yaw, gaz, 0.5f));
     }
 }
