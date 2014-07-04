@@ -100,6 +100,7 @@ public class DroneTemplate2 implements Lifecycle {
                         ByteOrder.LITTLE_ENDIAN);
                 payloadSize = Math.min(payloadSize, optionData.remaining());
                 optionData.limit(payloadSize);
+                logger.info("Parsin tag " + tag);
                 parseOption(tag, optionData);
                 buffer.position(buffer.position() + payloadSize);
             }
