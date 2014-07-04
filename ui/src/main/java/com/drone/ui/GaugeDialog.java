@@ -1,11 +1,7 @@
 package com.drone.ui;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
-import com.drone.Drone;
-import com.drone.GaugeConfiguration;
 import com.drone.ui.charts.DataGauge;
 import com.vaadin.addon.touchkit.ui.HorizontalButtonGroup;
 import com.vaadin.addon.touchkit.ui.Popover;
@@ -43,7 +39,8 @@ public class GaugeDialog extends Popover {
         layout.setMargin(true);
         layout.setSpacing(true);
 
-        List<GaugeConfiguration> availableGauges = determineAvailableGauges();
+        List<GaugeConfiguration> availableGauges = GaugeFinder
+                .findAvailableGauges();
 
         gaugeSelector = new ComboBox("Gauges");
         gaugeSelector.setWidth(100, Unit.PERCENTAGE);
@@ -95,18 +92,5 @@ public class GaugeDialog extends Popover {
 
     private void onCloseClicked() {
         close();
-    }
-
-    private List<GaugeConfiguration> determineAvailableGauges() {
-        List<GaugeConfiguration> droneProperties = new ArrayList<>();
-
-        for (Method method : drone.getNavData().getClass().getMethods()) {
-            if (method.isAnnotationPresent(GaugeConfiguration.class)) {
-                droneProperties.add(method
-                        .getAnnotation(GaugeConfiguration.class));
-            }
-        }
-
-        return droneProperties;
     }
 }

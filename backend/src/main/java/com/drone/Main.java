@@ -20,9 +20,9 @@ public class Main {
         }
 
         @Bean
-        DroneTemplate2 provideDroneTemplate(TaskExecutor taskExecutor ) throws UnknownHostException {
+        DroneTemplate provideDroneTemplate(TaskExecutor taskExecutor ) throws UnknownHostException {
             DroneStateChangeCallback listener = latestState -> System.out.println("the latest state is: " + latestState);
-            return new DroneTemplate2 (  taskExecutor );
+            return new DroneTemplate (  taskExecutor );
         }
     }
 

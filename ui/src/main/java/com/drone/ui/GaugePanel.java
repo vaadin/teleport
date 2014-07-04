@@ -11,9 +11,7 @@ import org.vaadin.spring.VaadinComponent;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.EventBusListenerMethod;
 
-import com.drone.Drone;
 import com.drone.DroneProperty;
-import com.drone.GaugeConfiguration;
 import com.drone.event.property.AbstractDronePropertyEvent;
 import com.drone.ui.charts.DataGauge;
 import com.vaadin.server.FontAwesome;
@@ -108,6 +106,10 @@ public class GaugePanel extends CustomComponent implements InitializingBean,
 
     @EventBusListenerMethod
     protected void onGaugeEvent(AbstractDronePropertyEvent event) {
+        if (getUI() == null) {
+            return;
+        }
+
         getUI().access(new Runnable() {
             @Override
             public void run() {

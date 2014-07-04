@@ -8,7 +8,6 @@ import org.vaadin.spring.VaadinComponent;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.EventBusListenerMethod;
 
-import com.drone.Drone;
 import com.drone.event.DroneControlUpdateEvent;
 import com.vaadin.addon.touchkit.ui.Switch;
 import com.vaadin.addon.touchkit.ui.VerticalComponentGroup;
