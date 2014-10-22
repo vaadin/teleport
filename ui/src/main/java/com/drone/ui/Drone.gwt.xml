@@ -3,5 +3,9 @@
 	<inherits name="com.vaadin.DefaultWidgetSet" />
 	<inherits name="com.vaadin.jogdial.JogDialWidgetset" />
 	<inherits name="com.vaadin.addon.touchkit.gwt.TouchKitWidgetSet" />
-	<inherits name="com.vaadin.addon.charts.ChartsWithTimelineWidgetset" />
+	
+
+    <inherits name="com.vaadin.addon.timeline.gwt.TimelineWidgetSet" />
+
+    <inherits name="com.vaadin.addon.charts.Widgetset" />
 </module>
