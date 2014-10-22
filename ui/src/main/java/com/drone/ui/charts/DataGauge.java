@@ -1,7 +1,5 @@
 package com.drone.ui.charts;
 
-import java.math.BigDecimal;
-
 import com.drone.DroneProperty;
 import com.vaadin.addon.charts.Chart;
 import com.vaadin.addon.charts.ChartClickListener;
@@ -90,13 +88,7 @@ public class DataGauge extends CustomField<Float> {
      * @param value
      */
     public void setValue(float value) {
-        BigDecimal bigDecimalValue = BigDecimal.valueOf(value);
-        bigDecimalValue = bigDecimalValue
-                .multiply(BigDecimal.valueOf(maxValue));
-        bigDecimalValue = bigDecimalValue.setScale(precision,
-                BigDecimal.ROUND_HALF_EVEN);
-
-        dataSeries.updatePoint(0, bigDecimalValue);
+        dataSeries.updatePoint(0, value);
     }
 
     @Override

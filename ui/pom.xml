@@ -9,7 +9,7 @@
 	<artifactId>ui</artifactId>
 	<name>Vaadin UI</name>
 
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
 	<dependencies>
 		<dependency>
@@ -19,11 +19,7 @@
 		<dependency>
 			<groupId>org.vaadin.spring</groupId>
 			<artifactId>spring-vaadin-touchkit</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-websocket</artifactId>
+			<version>0.0.3-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -37,40 +33,17 @@
 		<dependency>
 			<groupId>com.vaadin.addon</groupId>
 			<artifactId>vaadin-touchkit-agpl</artifactId>
-			<version>4.0.0.beta1</version>
+			<version>4.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin.addon</groupId>
 			<artifactId>vaadin-charts</artifactId>
-			<version>1.1.6</version>
-		</dependency>
-		<dependency>
-			<groupId>com.vaadin</groupId>
-			<artifactId>vaadin-client-compiler</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.eclipse.jetty</groupId>
-					<artifactId>jetty-annotations</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.eclipse.jetty</groupId>
-					<artifactId>jetty-servlets</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.eclipse.jetty</groupId>
-					<artifactId>jetty-util</artifactId>
-				</exclusion>
-			</exclusions>
-			<scope>provided</scope>
+			<version>1.1.7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin-client</artifactId>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<artifactId>dawn</artifactId>
-			<groupId>org.peimari</groupId>
 		</dependency>
 		<dependency>
 			<groupId>com.vaadin</groupId>
@@ -81,11 +54,6 @@
 			<groupId>com.vaadin</groupId>
 			<artifactId>jogdial-widget</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>4.3.1.Final</version>
 		</dependency>
 
 	</dependencies>
@@ -108,6 +76,7 @@
 				<executions>
 					<execution>
 						<goals>
+							<goal>update-widgetset</goal>
 							<goal>resources</goal>
 							<goal>compile</goal>
 						</goals>

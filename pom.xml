@@ -14,15 +14,15 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.1.1.RELEASE</version>
+		<version>1.1.8.RELEASE</version>
 	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<start-class>teleport.Application</start-class>
 		<java.version>1.8</java.version>
-		<vaadin.version>7.2.2</vaadin.version>
-		<spring-boot.version>1.1.1.RELEASE</spring-boot.version>
+		<vaadin.version>7.3.3</vaadin.version>
+		<spring-boot.version>1.1.8.RELEASE</spring-boot.version>
 	</properties>
 
 	<modules>
@@ -36,7 +36,7 @@
 			<dependency>
 				<groupId>org.vaadin.spring</groupId>
 				<artifactId>spring-boot-vaadin</artifactId>
-				<version>0.0.2-SNAPSHOT</version>
+				<version>0.0.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>com.vaadin</groupId>
@@ -45,36 +45,13 @@
 			</dependency>
 			<dependency>
 				<groupId>com.vaadin</groupId>
-				<artifactId>vaadin-client-compiler</artifactId>
-				<version>${vaadin.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-client</artifactId>
 				<version>${vaadin.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.vaadin.spring</groupId>
-				<artifactId>spring-vaadin</artifactId>
-				<version>0.0.2-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<artifactId>dawn</artifactId>
-				<groupId>org.peimari</groupId>
-				<version>1</version>
+				<scope>provided</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-<!-- 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
- -->
+
 	<repositories>
 		<repository>
 			<id>vaadin-addons</id>

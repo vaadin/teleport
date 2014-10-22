@@ -2,7 +2,9 @@ package com.drone;
 
 public enum DroneProperty {
     ALTITUDE("Altitude"),
-    BATTERY("Battery");
+    BATTERY("Battery"),
+    WIFI_LINK_QUALITY("Wifi"),
+    THETA("Heading theta");
 
     private final String name;
 

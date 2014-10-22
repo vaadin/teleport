@@ -1,9 +1,11 @@
-package com.drone;
+package com.drone.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.EventBusScope;
 import org.vaadin.spring.events.EventScope;
+
+import com.drone.DroneTemplate;
 
 public class Drone {
     private static final double DEFAULT_MAX_SPEED = 25.0;
@@ -12,8 +14,6 @@ public class Drone {
     private boolean flying;
     private double maxSpeed;
     private double maxAltitude;
-
-    private DroneNavData navData;
 
     @Autowired
     private DroneTemplate template;
@@ -25,12 +25,6 @@ public class Drone {
     public Drone() {
         maxSpeed = DEFAULT_MAX_SPEED;
         maxAltitude = DEFAULT_MAX_ALTITUDE;
-
-        navData = new DroneNavData();
-    }
-
-    void setNavData(DroneNavData navData) {
-        this.navData = navData;
     }
 
     public void resetEmergency() {
@@ -46,7 +40,7 @@ public class Drone {
         this.flying = flying;
 
         if (flying) {
-            template.takeOff();
+            template.takeoff();
         } else {
             template.land();
         }
@@ -63,35 +57,6 @@ public class Drone {
     @BroadcastDroneCommand
     public void setMaxSpeed(double maxSpeed) {
         this.maxSpeed = maxSpeed;
-        template.setVelocity(maxSpeed);
-    }
-
-    public int getBattery() {
-        return navData.getBattery();
-    }
-
-    public float getPitch() {
-        return navData.getPitch();
-    }
-
-    public float getRoll() {
-        return navData.getRoll();
-    }
-
-    public float getGaz() {
-        return navData.getGaz();
-    }
-
-    public float getYaw() {
-        return navData.getYaw();
-    }
-
-    public int getAltitude() {
-        return navData.getAltitude();
-    }
-
-    public DroneNavData getNavData() {
-        return navData;
     }
 
     public double getMaxAltitude() {

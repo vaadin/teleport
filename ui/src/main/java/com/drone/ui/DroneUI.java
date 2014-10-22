@@ -38,6 +38,8 @@ public class DroneUI extends UI implements InitializingBean, DisposableBean {
     private DroneEmergencyDialog emergencyDialog;
     private VerticalLayout mainLayout;
 
+    private float yaw, pitch, roll, gaz;
+
     @Override
     protected void init(VaadinRequest request) {
         emergencyDialog = new DroneEmergencyDialog(service);
@@ -51,11 +53,18 @@ public class DroneUI extends UI implements InitializingBean, DisposableBean {
         mainLayout.setSizeFull();
 
         JogDial rotation = new JogDial(Position.LEFT, 150);
-        rotation.addAxesMoveListener(e -> service.rotateByAxis(e.getX() * -1));
+        rotation.addAxesMoveListener(e -> {
+            yaw = -e.getX();
+            gaz = e.getY();
+            service.move(yaw, pitch, roll, gaz);
+        });
 
         JogDial movement = new JogDial(Position.RIGHT, 150);
-        movement.addAxesMoveListener(e -> service.moveByAxis(e.getX() * -1,
-                e.getY() * -1));
+        movement.addAxesMoveListener(e -> {
+            pitch = -e.getX();
+            roll = -e.getY();
+            service.move(yaw, pitch, roll, gaz);
+        });
 
         HorizontalLayout jogDialLayout = new HorizontalLayout();
         jogDialLayout.setWidth(100, Unit.PERCENTAGE);

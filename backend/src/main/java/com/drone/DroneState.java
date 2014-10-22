@@ -1,10 +1,18 @@
 package com.drone;
 
 public class DroneState {
+    private final long sequenceNumber;
     private final int state;
     private final int vision;
+    private float psi;
+    private float theta;
+    private float phi;
+    private int battery;
+    private int altitude;
+    private int linkQuality;
 
-    public DroneState(int state, int vision) {
+    public DroneState(long seqNo, int state, int vision) {
+        this.sequenceNumber = seqNo;
         this.state = state;
         this.vision = vision;
     }
@@ -224,4 +232,51 @@ public class DroneState {
         return sb.toString();
     }
 
+    public void setLinkQuality(int linkQuality) {
+        this.linkQuality = linkQuality;
+    }
+
+    public int getLinkQuality() {
+        return linkQuality;
+    }
+
+    public void setAltitude(int altitude) {
+        this.altitude = altitude;
+    }
+
+    public int getAltitude() {
+        return altitude;
+    }
+
+    public void setBattery(int battery) {
+        this.battery = battery;
+    }
+
+    public int getBattery() {
+        return battery;
+    }
+
+    public void setTheta(float theta) {
+        this.theta = theta;
+    }
+
+    public float getTheta() {
+        return theta;
+    }
+
+    public void setPhi(float phi) {
+        this.phi = phi;
+    }
+
+    public float getPhi() {
+        return phi;
+    }
+
+    public void setPsi(float psi) {
+        this.psi = psi;
+    }
+
+    public float getPsi() {
+        return psi;
+    }
 }

@@ -1,12 +1,13 @@
 package com.drone.event.property;
 
 import com.drone.DroneProperty;
-import com.drone.DroneTemplate;
+import com.drone.ui.GaugeConfiguration;
 
+@GaugeConfiguration(property = DroneProperty.BATTERY, maxValue = 100, precision = 0)
 public class DroneBatteryEvent extends AbstractDronePropertyEvent {
 
-    public DroneBatteryEvent(DroneTemplate template, float batteryLevel) {
-        super(template, batteryLevel);
+    public DroneBatteryEvent(Object source, int batteryLevel) {
+        super(source, batteryLevel);
     }
 
     @Override
