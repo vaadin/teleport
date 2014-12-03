@@ -9,10 +9,12 @@ import org.vaadin.spring.events.EventBus;
 import org.vaadin.spring.events.EventBusListenerMethod;
 
 import com.drone.event.DroneControlUpdateEvent;
+import com.drone.event.DroneEmergencyEvent;
 import com.vaadin.addon.touchkit.ui.Switch;
 import com.vaadin.addon.touchkit.ui.VerticalComponentGroup;
 import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Slider;
 
@@ -49,6 +51,9 @@ public class ControlPanel extends CustomComponent implements InitializingBean,
 
         flying = new Switch("Fly");
 
+        Button emergency = new Button("Emergency");
+        emergency.addClickListener(e -> drone.declareEmergency());
+
         maxSpeed = new Slider("Max speed");
         maxSpeed.setMin(0);
         maxSpeed.setMax(100);
@@ -57,7 +62,7 @@ public class ControlPanel extends CustomComponent implements InitializingBean,
         maxAltitude.setMin(0);
         maxAltitude.setMax(4);
 
-        layout.addComponents(flying, maxSpeed, maxAltitude);
+        layout.addComponents(flying, emergency, maxSpeed, maxAltitude);
 
         fieldGroup.bindMemberFields(this);
 
@@ -79,12 +84,12 @@ public class ControlPanel extends CustomComponent implements InitializingBean,
 
     @EventBusListenerMethod
     protected void onDroneControlUpdate(DroneControlUpdateEvent event) {
-        getUI().access(new Runnable() {
+        getUI().access(() -> fieldGroup.setItemDataSource(drone));
+    }
 
-            @Override
-            public void run() {
-                fieldGroup.setItemDataSource(drone);
-            }
-        });
+    @EventBusListenerMethod
+    protected void onEmergency(DroneEmergencyEvent emergencyEvent) {
+        drone.setFlying(false);
+        getUI().access(() -> fieldGroup.setItemDataSource(drone));
     }
 }

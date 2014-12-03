@@ -1,23 +1,29 @@
 package com.drone.ui;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.vaadin.spring.UIScope;
+import org.vaadin.spring.VaadinComponent;
+
 import com.drone.DroneTemplate;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
+@VaadinComponent
+@UIScope
 public class DroneEmergencyDialog extends Window {
     private static final long serialVersionUID = -8190654181638447706L;
 
+    @Autowired
     private DroneTemplate template;
 
-    public DroneEmergencyDialog(DroneTemplate service) {
-        super("EMERGENCY!");
+    private Label text;
 
-        this.template = service;
+    public DroneEmergencyDialog() {
+        super("EMERGENCY!");
 
         setResizable(false);
         setClosable(false);
@@ -30,19 +36,11 @@ public class DroneEmergencyDialog extends Window {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
 
-        Label text = new Label(
-                "Drone is in emergency state due to exceeded angular value, "
-                        + "battery level or crash. Please press reset button to "
-                        + "restart or wait for the flight operator to restart the drone.");
+        text = new Label("");
 
-        Button reset = new Button("Reset", new Button.ClickListener() {
-            private static final long serialVersionUID = 7823977356718657023L;
-
-            @Override
-            public void buttonClick(ClickEvent event) {
-                close();
-                template.resetEmergency();
-            }
+        Button reset = new Button("Reset", e -> {
+            close();
+            template.setResetEmergency();
         });
 
         layout.setMargin(true);
@@ -56,7 +54,8 @@ public class DroneEmergencyDialog extends Window {
         setContent(layout);
     }
 
-    public void show(UI ui) {
+    public void show(EmergencyType type, UI ui) {
+        this.text.setValue(type.getDescription());
         close();
         ui.addWindow(this);
     }

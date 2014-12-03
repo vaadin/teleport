@@ -17,6 +17,10 @@ public class DroneState {
         this.vision = vision;
     }
 
+    public long getSequenceNumber() {
+        return sequenceNumber;
+    }
+
     public int getStateBits() {
         return state;
     }

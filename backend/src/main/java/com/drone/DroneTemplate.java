@@ -32,6 +32,7 @@ import com.drone.command.DroneCommand;
 import com.drone.command.LandCommand;
 import com.drone.command.MoveByAxisCommand;
 import com.drone.command.ResetWatchdogCommand;
+import com.drone.command.SetResetEmergencyCommand;
 import com.drone.command.TakeOffCommand;
 
 public class DroneTemplate implements Lifecycle {
@@ -240,7 +241,7 @@ public class DroneTemplate implements Lifecycle {
 
     private void navDataLoop(InetAddress address, DatagramSocket navDataSocket,
             int navPort, int maxPacketSize) throws Exception {
-        navDataSocket.setSoTimeout(3000);
+        navDataSocket.setSoTimeout(1000);
 
         // tickle!
         navDataSocket.send(new DatagramPacket(new byte[] { 0x01, 0x00, 0x00,
@@ -256,11 +257,12 @@ public class DroneTemplate implements Lifecycle {
         long lastReportTime = System.currentTimeMillis();
 
         while (isRunning()) {
+            long timeNow = System.currentTimeMillis();
             DroneState currentState = readDroneState(navDataSocket,
                     maxPacketSize);
 
-            long timeNow = System.currentTimeMillis();
             if (timeNow - lastReportTime > 1000) {
+
                 callbacks.forEach(cb -> cb.onDroneStateChanged(currentState));
                 lastReportTime = timeNow;
             }
@@ -385,17 +387,25 @@ public class DroneTemplate implements Lifecycle {
 
         this.taskExecutor.execute(() -> {
             try {
+                logger.info("Staring command loop executor");
                 commandLoop(address, commandSocket, commandPort);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
 
+        runNavData(address, navPort, navSocket);
+    }
+
+    private void runNavData(InetAddress address, int navPort,
+            DatagramSocket navSocket) {
         this.taskExecutor.execute(() -> {
             try {
+                logger.info("Starting nav data executor");
                 navDataLoop(address, navSocket, navPort, 2048);
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                logger.warn("Rerunning nav data because of " + e.getMessage());
+                runNavData(address, navPort, navSocket);
             }
         });
     }
@@ -424,8 +434,8 @@ public class DroneTemplate implements Lifecycle {
         enqueueCommand(new LandCommand());
     }
 
-    public void resetEmergency() {
-        enqueueCommand(new TakeOffCommand());
+    public void setResetEmergency() {
+        enqueueCommand(new SetResetEmergencyCommand());
     }
 
     public void move(float yaw, float pitch, float roll, float gaz) {

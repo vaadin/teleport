@@ -6,9 +6,20 @@ public abstract class RefCommand extends DroneCommand {
 
     private final String commandArgument;
 
-    public RefCommand(String cmd) {
+    public RefCommand(boolean takeoff, boolean emergency) {
         super(CommandType.REF);
-        this.commandArgument = cmd;
+
+        int value = (1 << 18) | (1 << 20) | (1 << 22) | (1 << 24) | (1 << 28);
+
+        if (emergency) {
+            value |= (1 << 8);
+        }
+
+        if (takeoff) {
+            value |= (1 << 9);
+        }
+
+        commandArgument = Integer.toString(value);
     }
 
     @Override

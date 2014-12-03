@@ -9,6 +9,7 @@ import org.vaadin.spring.touchkit.TouchKitUI;
 
 import com.drone.DroneTemplate;
 import com.drone.event.DroneEmergencyEvent;
+import com.drone.event.DroneLowBatteryEvent;
 import com.vaadin.annotations.Theme;
 import com.vaadin.jogdial.JogDial;
 import com.vaadin.jogdial.client.Position;
@@ -35,15 +36,15 @@ public class DroneUI extends UI implements InitializingBean, DisposableBean {
     @Autowired
     private EventBus eventBus;
 
+    @Autowired
     private DroneEmergencyDialog emergencyDialog;
+
     private VerticalLayout mainLayout;
 
     private float yaw, pitch, roll, gaz;
 
     @Override
     protected void init(VaadinRequest request) {
-        emergencyDialog = new DroneEmergencyDialog(service);
-
         UI.getCurrent().setPollInterval(1000);
 
         setSizeFull();
@@ -100,11 +101,13 @@ public class DroneUI extends UI implements InitializingBean, DisposableBean {
 
     @EventBusListenerMethod
     protected void onEmergencyEvent(DroneEmergencyEvent event) {
-        getUI().access(new Runnable() {
-            @Override
-            public void run() {
-                emergencyDialog.show(getUI());
-            }
-        });
+        getUI().access(
+                () -> emergencyDialog.show(event.getEmergencyType(), getUI()));
+    }
+
+    @EventBusListenerMethod
+    protected void onBatterLowEvent(DroneLowBatteryEvent event) {
+        getUI().access(
+                () -> emergencyDialog.show(EmergencyType.LOW_BATTERY, getUI()));
     }
 }

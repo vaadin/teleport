@@ -28,7 +28,7 @@ public class Drone {
     }
 
     public void resetEmergency() {
-        template.resetEmergency();
+        template.setResetEmergency();
     }
 
     public boolean isFlying() {
@@ -66,5 +66,9 @@ public class Drone {
     @BroadcastDroneCommand
     public void setMaxAltitude(double maxAltitude) {
         this.maxAltitude = maxAltitude;
+    }
+
+    public void declareEmergency() {
+        template.setResetEmergency();
     }
 }

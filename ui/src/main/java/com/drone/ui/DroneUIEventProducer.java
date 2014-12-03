@@ -24,10 +24,22 @@ class DroneUIEventProducer implements DroneStateChangeCallback {
     @Override
     public void onDroneStateChanged(DroneState latestState) {
         if (latestState.isEmergency()) {
-            eventBus.publish(this, new DroneEmergencyEvent());
+            EmergencyType type = null;
+            if (latestState.isAngelsOutOufRange()) {
+                type = EmergencyType.ANGLES_EXCEEDED;
+            } else if (latestState.isUserEmergencyLanding()) {
+                type = EmergencyType.USER_EMERGENCY;
+            } else {
+                type = EmergencyType.UNKNOWN;
+            }
+            eventBus.publish(this, new DroneEmergencyEvent(type));
+            System.out.println("Motor down? " + latestState.isMotorsDown()
+                    + " Angle exeeded? " + latestState.isAngelsOutOufRange()
+                    + " Battery low? " + latestState.isBatteryTooLow());
         }
         if (latestState.isBatteryTooLow()) {
             eventBus.publish(this, new DroneLowBatteryEvent());
+            System.out.println("Low battery");
         }
 
         eventBus.publish(this,
