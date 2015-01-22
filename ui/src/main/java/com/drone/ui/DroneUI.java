@@ -4,8 +4,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.vaadin.spring.events.EventBus;
-import org.vaadin.spring.events.EventBusListenerMethod;
-import org.vaadin.spring.touchkit.TouchKitUI;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
+import org.vaadin.spring.touchkit.annotation.TouchKitUI;
 
 import com.drone.DroneTemplate;
 import com.drone.event.DroneEmergencyEvent;

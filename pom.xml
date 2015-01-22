@@ -14,15 +14,17 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.1.8.RELEASE</version>
+		<version>1.2.1.RELEASE</version>
 	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<start-class>teleport.Application</start-class>
 		<java.version>1.8</java.version>
-		<vaadin.version>7.3.3</vaadin.version>
-		<spring-boot.version>1.1.8.RELEASE</spring-boot.version>
+		<vaadin.version>7.3.8</vaadin.version>
+		<spring-boot.version>1.2.1.RELEASE</spring-boot.version>
+		<vaadin-charts.version>2.0.0</vaadin-charts.version>
+		<vaadin4spring.version>0.0.4-SNAPSHOT</vaadin4spring.version>
 	</properties>
 
 	<modules>
@@ -35,12 +37,22 @@
 			<dependency>
 				<groupId>org.vaadin.spring</groupId>
 				<artifactId>spring-boot-vaadin</artifactId>
-				<version>0.0.3-SNAPSHOT</version>
+				<version>${vaadin4spring.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.vaadin.spring</groupId>
+				<artifactId>spring-vaadin-touchkit</artifactId>
+				<version>${vaadin4spring.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-server</artifactId>
 				<version>${vaadin.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.vaadin.addon</groupId>
+				<artifactId>vaadin-charts</artifactId>
+				<version>${vaadin-charts.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>com.vaadin</groupId>

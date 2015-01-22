@@ -3,10 +3,10 @@ package com.drone.ui;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.spring.UIScope;
-import org.vaadin.spring.VaadinComponent;
+import org.vaadin.spring.annotation.VaadinComponent;
+import org.vaadin.spring.annotation.VaadinUIScope;
 import org.vaadin.spring.events.EventBus;
-import org.vaadin.spring.events.EventBusListenerMethod;
+import org.vaadin.spring.events.annotation.EventBusListenerMethod;
 
 import com.drone.event.DroneControlUpdateEvent;
 import com.drone.event.DroneEmergencyEvent;
@@ -19,7 +19,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Slider;
 
 @VaadinComponent
-@UIScope
+@VaadinUIScope
 public class ControlPanel extends CustomComponent implements InitializingBean,
         DisposableBean {
     private static final long serialVersionUID = 8067787477217415968L;

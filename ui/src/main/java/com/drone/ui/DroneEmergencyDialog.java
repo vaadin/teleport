@@ -1,8 +1,8 @@
 package com.drone.ui;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.vaadin.spring.UIScope;
-import org.vaadin.spring.VaadinComponent;
+import org.vaadin.spring.annotation.VaadinComponent;
+import org.vaadin.spring.annotation.VaadinUIScope;
 
 import com.drone.DroneTemplate;
 import com.vaadin.ui.Alignment;
@@ -13,7 +13,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 
 @VaadinComponent
-@UIScope
+@VaadinUIScope
 public class DroneEmergencyDialog extends Window {
     private static final long serialVersionUID = -8190654181638447706L;
 
