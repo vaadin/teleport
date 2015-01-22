@@ -25,6 +25,7 @@ public abstract class DroneCommand implements Ordered {
     private CommandType commandType;
 
     private int order;
+
     public DroneCommand(CommandType commandType) {
         this(commandType, 0);
     }
@@ -37,6 +38,9 @@ public abstract class DroneCommand implements Ordered {
         return false;
     }
 
+    public boolean clearSticky() {
+        return false;
+    }
 
     protected DroneCommand(CommandType commandType, int order) {
         this.commandType = commandType;
@@ -47,7 +51,6 @@ public abstract class DroneCommand implements Ordered {
         return "AT*" + commandType.name() + "=" + commandSeqNo + ","
                 + buildParameters() + "\r";
     }
-
 
     @Override
     public int getOrder() {

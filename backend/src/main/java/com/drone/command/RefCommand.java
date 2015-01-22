@@ -28,6 +28,11 @@ public abstract class RefCommand extends DroneCommand {
     }
 
     @Override
+    public boolean clearSticky() {
+        return true;
+    }
+
+    @Override
     public int getOrder() {
         return Ordered.HIGHEST_PRECEDENCE;
     }

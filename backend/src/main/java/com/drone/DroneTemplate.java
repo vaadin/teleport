@@ -316,7 +316,7 @@ public class DroneTemplate implements Lifecycle {
                     // sticky commands replace previous sticky
                     stickyCommand = command;
                     lastRecordedTime = System.currentTimeMillis();
-                } else /* if (command.clearSticky()) */{
+                } else if (command.clearSticky()) {
                     // only some commands can clear sticky commands
                     stickyCommand = null;
                 }
@@ -329,6 +329,7 @@ public class DroneTemplate implements Lifecycle {
                 waitForControlAckToBe(true,
                         () -> sendCommand(address, socket, gross, commandPort));
             } else {
+                Thread.sleep(Math.max(0, 40 - deltaTime));
                 sendCommand(address, socket, gross, commandPort);
             }
         }
@@ -340,7 +341,7 @@ public class DroneTemplate implements Lifecycle {
         Assert.notNull(droneCommand, "the droneCommand must not be null");
         String commandString = droneCommand.buildCommand(this.sequenceNumber
                 .getAndIncrement());
-        // logger.info(commandString);
+        logger.info(commandString);
         byte[] bytes = commandString.getBytes();
         datagramSocket.send(new DatagramPacket(bytes, bytes.length, address,
                 commandPort));

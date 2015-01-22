@@ -16,7 +16,6 @@ public class PcmdCommand extends DroneCommand {
         this.roll = roll;
         this.gaz = gaz;
         this.yaw = yaw;
-
     }
 
     @Override
@@ -44,7 +43,7 @@ public class PcmdCommand extends DroneCommand {
 
     @Override
     public boolean isRepeated() {
-        return false;
+        return true;
     }
 
     @Override
