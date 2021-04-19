@@ -21,7 +21,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<start-class>teleport.Application</start-class>
 		<java.version>1.8</java.version>
-		<vaadin.version>7.3.8</vaadin.version>
+		<vaadin.version>8.12.4</vaadin.version>
 		<spring-boot.version>1.2.1.RELEASE</spring-boot.version>
 		<vaadin-charts.version>2.0.0</vaadin-charts.version>
 		<vaadin4spring.version>0.0.4-SNAPSHOT</vaadin4spring.version>
